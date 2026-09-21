@@ -1,0 +1,2680 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agent Reach desde cero en Windows 11 — Tutorial Profesional</title>
+<style>
+  :root{
+    --bg:#0a0e1a;
+    --card:#0f172a;
+    --border:#1e3a5f;
+    --accent:#00d4ff;
+    --green:#22c55e;
+    --amber:#f59e0b;
+    --red:#ef4444;
+    --purple:#a855f7;
+    --text:#e2e8f0;
+    --muted:#94a3b8;
+    --mono:'Consolas','SF Mono','Monaco','Courier New',monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Segoe UI',system-ui,-apple-system,sans-serif;
+    line-height:1.65;
+    font-size:15.5px;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+  /* ============ PROGRESS BAR ============ */
+  #progressWrap{
+    position:fixed;top:0;left:0;right:0;height:4px;
+    background:#0d1424;z-index:1000;
+  }
+  #progressBar{
+    height:100%;width:0%;
+    background:linear-gradient(90deg,#00d4ff,#a855f7,#22c55e);
+    transition:width .12s linear;
+    box-shadow:0 0 12px rgba(0,212,255,.7);
+  }
+  /* ============ NAVBAR ============ */
+  #navbar{
+    position:fixed;top:4px;left:0;right:0;height:56px;
+    background:rgba(10,14,26,.92);
+    backdrop-filter:blur(14px);
+    -webkit-backdrop-filter:blur(14px);
+    border-bottom:1px solid var(--border);
+    z-index:999;
+    display:flex;align-items:center;
+  }
+  #navScroll{
+    display:flex;gap:6px;
+    overflow-x:auto;overflow-y:hidden;
+    padding:0 12px;
+    scrollbar-width:thin;
+    scrollbar-color:#1e3a5f transparent;
+    width:100%;
+    height:100%;
+    align-items:center;
+  }
+  #navScroll::-webkit-scrollbar{height:5px}
+  #navScroll::-webkit-scrollbar-thumb{background:#1e3a5f;border-radius:3px}
+  #navScroll::-webkit-scrollbar-track{background:transparent}
+  .navbtn{
+    flex:0 0 auto;
+    background:transparent;
+    color:var(--muted);
+    border:1px solid transparent;
+    border-radius:8px;
+    padding:8px 13px;
+    font-size:12.5px;
+    font-weight:600;
+    letter-spacing:.4px;
+    cursor:pointer;
+    font-family:inherit;
+    transition:all .2s ease;
+    white-space:nowrap;
+    text-transform:uppercase;
+  }
+  .navbtn:hover{color:var(--accent);border-color:var(--border);background:#0d1526}
+  .navbtn.active{
+    color:#04121c;
+    background:linear-gradient(135deg,#00d4ff,#22c55e);
+    border-color:transparent;
+    box-shadow:0 0 14px rgba(0,212,255,.45);
+  }
+  /* ============ LAYOUT ============ */
+  main{
+    max-width:1180px;
+    margin:0 auto;
+    padding:80px 18px 70px;
+  }
+  .section{display:none;animation:fadeIn .45s ease}
+  .section.active{display:block}
+  @keyframes fadeIn{
+    from{opacity:0;transform:translateY(14px)}
+    to{opacity:1;transform:translateY(0)}
+  }
+  /* ============ HERO SVG ============ */
+  #svgHost{
+    width:100%;
+    margin:0 0 26px;
+    border-radius:14px;
+    overflow:hidden;
+    border:1px solid var(--border);
+    box-shadow:0 0 40px rgba(0,212,255,.14),0 18px 44px rgba(0,0,0,.55);
+    background:#070b14;
+    line-height:0;
+  }
+  #svgHost svg{display:block;width:100%;height:auto}
+  /* ============ HOME ============ */
+  .badge-top{
+    display:inline-block;
+    background:linear-gradient(135deg,rgba(0,212,255,.14),rgba(168,85,247,.14));
+    border:1px solid rgba(0,212,255,.42);
+    color:var(--accent);
+    font-size:11.5px;
+    font-weight:700;
+    letter-spacing:2px;
+    padding:6px 15px;
+    border-radius:20px;
+    margin-bottom:16px;
+    text-transform:uppercase;
+  }
+  h1.hero-title{
+    font-size:clamp(1.85rem,5vw,3.1rem);
+    line-height:1.15;
+    font-weight:800;
+    letter-spacing:-.5px;
+    background:linear-gradient(135deg,#00d4ff 0%,#a855f7 55%,#22c55e 100%);
+    -webkit-background-clip:text;
+    background-clip:text;
+    -webkit-text-fill-color:transparent;
+    margin-bottom:14px;
+  }
+  .hero-sub{
+    font-size:clamp(1rem,2.3vw,1.22rem);
+    color:var(--muted);
+    margin-bottom:20px;
+    font-weight:400;
+    max-width:820px;
+  }
+  .hero-desc{
+    color:#cbd5e1;
+    max-width:900px;
+    margin-bottom:24px;
+    font-size:15.5px;
+  }
+  .quote-block{
+    border-left:4px solid var(--accent);
+    background:linear-gradient(90deg,rgba(0,212,255,.09),transparent);
+    padding:16px 20px;
+    border-radius:0 10px 10px 0;
+    margin:26px 0;
+    font-style:italic;
+    color:#dbeafe;
+    font-size:16px;
+  }
+  .metrics{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+    gap:14px;
+    margin:28px 0;
+  }
+  .metric{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:16px;
+    text-align:center;
+    transition:all .25s ease;
+  }
+  .metric:hover{
+    border-color:var(--accent);
+    transform:translateY(-3px);
+    box-shadow:0 8px 24px rgba(0,212,255,.16);
+  }
+  .metric .num{
+    font-size:1.75rem;
+    font-weight:800;
+    color:var(--accent);
+    display:block;
+    line-height:1.1;
+  }
+  .metric .lbl{
+    font-size:11.5px;
+    color:var(--muted);
+    text-transform:uppercase;
+    letter-spacing:1px;
+    margin-top:6px;
+    font-weight:600;
+  }
+  .datetime-box{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:16px 20px;
+    display:flex;
+    flex-wrap:wrap;
+    gap:22px;
+    margin-top:20px;
+    font-size:14px;
+  }
+  .datetime-box span{color:var(--muted)}
+  .datetime-box b{color:var(--green);font-weight:700}
+  /* ============ SECTION HEADERS ============ */
+  .sec-head{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    margin:0 0 22px;
+    padding-bottom:16px;
+    border-bottom:1px solid var(--border);
+  }
+  .sec-icon{
+    flex:0 0 auto;
+    width:46px;height:46px;
+    border-radius:11px;
+    display:flex;align-items:center;justify-content:center;
+    font-size:22px;
+    background:linear-gradient(135deg,rgba(0,212,255,.16),rgba(168,85,247,.16));
+    border:1px solid var(--border);
+  }
+  .sec-head h2{
+    font-size:clamp(1.3rem,3.4vw,1.75rem);
+    font-weight:800;
+    letter-spacing:-.3px;
+    color:#f1f5f9;
+  }
+  h3{
+    font-size:1.16rem;
+    font-weight:700;
+    color:var(--accent);
+    margin:30px 0 12px;
+    letter-spacing:-.2px;
+  }
+  h4{
+    font-size:1rem;
+    font-weight:700;
+    color:#e2e8f0;
+    margin:20px 0 9px;
+  }
+  p{margin-bottom:13px;color:#cbd5e1}
+  ul,ol{margin:0 0 15px 22px}
+  li{margin-bottom:7px;color:#cbd5e1}
+  li::marker{color:var(--accent)}
+  strong{color:#f1f5f9;font-weight:700}
+  em{color:#a5b4fc}
+  a{color:var(--accent);text-decoration:none;border-bottom:1px dotted rgba(0,212,255,.4);word-break:break-word}
+  a:hover{color:#67e8f9;border-bottom-color:#67e8f9}
+  /* ============ CARDS ============ */
+  .card{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:20px 22px;
+    margin:16px 0;
+  }
+  .card-accent{border-left:4px solid var(--accent)}
+  .card-green{border-left:4px solid var(--green)}
+  .card-amber{border-left:4px solid var(--amber)}
+  .card-red{border-left:4px solid var(--red)}
+  .card-purple{border-left:4px solid var(--purple)}
+  /* ============ CALLOUTS ============ */
+  .callout{
+    border-radius:10px;
+    padding:14px 18px;
+    margin:16px 0;
+    border-left:4px solid;
+    font-size:14.5px;
+  }
+  .callout .ct{
+    font-weight:800;
+    font-size:11.5px;
+    letter-spacing:1.6px;
+    text-transform:uppercase;
+    display:block;
+    margin-bottom:6px;
+  }
+  .callout.info{background:rgba(0,212,255,.07);border-color:var(--accent)}
+  .callout.info .ct{color:var(--accent)}
+  .callout.example{background:rgba(34,197,94,.07);border-color:var(--green)}
+  .callout.example .ct{color:var(--green)}
+  .callout.warn{background:rgba(245,158,11,.07);border-color:var(--amber)}
+  .callout.warn .ct{color:var(--amber)}
+  .callout.error{background:rgba(239,68,68,.07);border-color:var(--red)}
+  .callout.error .ct{color:var(--red)}
+  /* ============ CODE ============ */
+  pre{
+    background:#070b14;
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:14px 16px;
+    overflow-x:auto;
+    margin:12px 0;
+    font-family:var(--mono);
+    font-size:13px;
+    line-height:1.6;
+    color:#7dd3fc;
+    scrollbar-width:thin;
+    scrollbar-color:#1e3a5f transparent;
+  }
+  pre::-webkit-scrollbar{height:7px}
+  pre::-webkit-scrollbar-thumb{background:#1e3a5f;border-radius:4px}
+  code{
+    font-family:var(--mono);
+    font-size:.88em;
+    background:rgba(0,212,255,.1);
+    color:#67e8f9;
+    padding:2px 6px;
+    border-radius:5px;
+    border:1px solid rgba(0,212,255,.16);
+    word-break:break-word;
+  }
+  pre code{background:none;border:none;padding:0;color:inherit;font-size:13px}
+  /* ============ TABLES ============ */
+  .tbl-wrap{
+    overflow-x:auto;
+    margin:16px 0;
+    border-radius:10px;
+    border:1px solid var(--border);
+    scrollbar-width:thin;
+    scrollbar-color:#1e3a5f transparent;
+  }
+  .tbl-wrap::-webkit-scrollbar{height:7px}
+  .tbl-wrap::-webkit-scrollbar-thumb{background:#1e3a5f;border-radius:4px}
+  table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:13.5px;
+    min-width:520px;
+  }
+  th{
+    background:#0d1526;
+    color:var(--accent);
+    font-weight:700;
+    text-align:left;
+    padding:11px 13px;
+    border-bottom:2px solid var(--border);
+    font-size:12px;
+    letter-spacing:.6px;
+    text-transform:uppercase;
+    white-space:nowrap;
+  }
+  td{
+    padding:11px 13px;
+    border-bottom:1px solid rgba(30,58,95,.6);
+    color:#cbd5e1;
+    vertical-align:top;
+  }
+  tr:last-child td{border-bottom:none}
+  tr:hover td{background:rgba(0,212,255,.035)}
+  /* ============ STEPS ============ */
+  .step{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:18px 20px;
+    margin:16px 0;
+    position:relative;
+  }
+  .step-head{
+    display:flex;
+    align-items:center;
+    gap:11px;
+    margin-bottom:12px;
+    flex-wrap:wrap;
+  }
+  .step-num{
+    flex:0 0 auto;
+    background:linear-gradient(135deg,#00d4ff,#a855f7);
+    color:#04121c;
+    font-weight:800;
+    font-size:12px;
+    padding:4px 12px;
+    border-radius:20px;
+    letter-spacing:.8px;
+    white-space:nowrap;
+  }
+  .step-head h4{margin:0;font-size:1.02rem;color:#f1f5f9}
+  .step-sub{
+    font-size:12.5px;
+    color:var(--muted);
+    margin-bottom:8px;
+    font-weight:600;
+    letter-spacing:.5px;
+    text-transform:uppercase;
+  }
+  /* ============ CHIPS / BADGES ============ */
+  .chip{
+    display:inline-block;
+    font-size:11px;
+    font-weight:700;
+    padding:3px 10px;
+    border-radius:14px;
+    letter-spacing:.5px;
+    text-transform:uppercase;
+    margin:2px 4px 2px 0;
+  }
+  .chip-blue{background:rgba(0,212,255,.14);color:var(--accent);border:1px solid rgba(0,212,255,.34)}
+  .chip-green{background:rgba(34,197,94,.14);color:var(--green);border:1px solid rgba(34,197,94,.34)}
+  .chip-amber{background:rgba(245,158,11,.14);color:var(--amber);border:1px solid rgba(245,158,11,.34)}
+  .chip-red{background:rgba(239,68,68,.14);color:var(--red);border:1px solid rgba(239,68,68,.34)}
+  .chip-purple{background:rgba(168,85,247,.14);color:var(--purple);border:1px solid rgba(168,85,247,.34)}
+  /* ============ GRIDS ============ */
+  .grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin:16px 0}
+  .grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px;margin:16px 0}
+  /* ============ CAP CARD ============ */
+  .cap-card{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:0;
+    margin:18px 0;
+    overflow:hidden;
+  }
+  .cap-head{
+    background:linear-gradient(90deg,rgba(0,212,255,.09),transparent);
+    padding:14px 18px;
+    border-bottom:1px solid var(--border);
+    display:flex;
+    align-items:center;
+    gap:11px;
+    flex-wrap:wrap;
+  }
+  .cap-head .ic{font-size:20px}
+  .cap-head h3{margin:0;font-size:1.06rem;color:#f1f5f9}
+  .cap-body{padding:16px 18px}
+  /* ============ ACCORDION ============ */
+  .acc{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:10px;
+    margin:10px 0;
+    overflow:hidden;
+  }
+  .acc-head{
+    padding:13px 17px;
+    cursor:pointer;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:12px;
+    font-weight:700;
+    color:#e2e8f0;
+    font-size:14px;
+    user-select:none;
+    transition:background .2s;
+  }
+  .acc-head:hover{background:rgba(0,212,255,.05)}
+  .acc-head .arw{
+    color:var(--accent);
+    transition:transform .25s;
+    font-size:12px;
+    flex:0 0 auto;
+  }
+  .acc.open .acc-head .arw{transform:rotate(90deg)}
+  .acc-body{
+    max-height:0;
+    overflow:hidden;
+    transition:max-height .35s ease;
+    padding:0 17px;
+  }
+  .acc.open .acc-body{max-height:4000px;padding:0 17px 15px}
+  /* ============ BACK TO TOP ============ */
+  #toTop{
+    position:fixed;
+    bottom:22px;right:20px;
+    width:48px;height:48px;
+    border-radius:50%;
+    background:linear-gradient(135deg,#00d4ff,#a855f7);
+    color:#04121c;
+    border:none;
+    font-size:20px;
+    font-weight:800;
+    cursor:pointer;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    box-shadow:0 6px 22px rgba(0,212,255,.42);
+    z-index:998;
+    transition:transform .2s;
+  }
+  #toTop:hover{transform:translateY(-3px) scale(1.05)}
+  #toTop.show{display:flex}
+  /* ============ FOOTER ============ */
+  footer{
+    border-top:1px solid var(--border);
+    background:#070b14;
+    padding:30px 18px;
+    text-align:center;
+    color:var(--muted);
+    font-size:13.5px;
+    line-height:2;
+  }
+  footer .lat{
+    font-style:italic;
+    color:var(--purple);
+    margin-top:8px;
+    font-size:13px;
+  }
+  /* ============ CREDITS ============ */
+  .credits-card{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:26px;
+    text-align:center;
+    margin:22px 0;
+  }
+  .credits-card h3{color:var(--accent);margin-top:0;font-size:1.3rem}
+  .credits-name{
+    font-size:1.5rem;
+    font-weight:800;
+    background:linear-gradient(135deg,#00d4ff,#a855f7);
+    -webkit-background-clip:text;
+    background-clip:text;
+    -webkit-text-fill-color:transparent;
+    margin:10px 0;
+  }
+  .credits-meta{color:var(--muted);font-size:14px;margin:6px 0}
+  .credits-lat{
+    font-style:italic;
+    color:var(--purple);
+    margin-top:16px;
+    font-size:15px;
+  }
+  /* ============ FLOW DIAGRAM ============ */
+  .flow{
+    background:#070b14;
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:18px;
+    font-family:var(--mono);
+    font-size:13px;
+    color:#7dd3fc;
+    text-align:center;
+    line-height:2.1;
+    overflow-x:auto;
+    margin:16px 0;
+  }
+  /* ============ RESPONSIVE ============ */
+  @media (max-width:768px){
+    body{font-size:15px}
+    main{padding:76px 13px 60px}
+    .navbtn{padding:7px 10px;font-size:11px}
+    .sec-icon{width:40px;height:40px;font-size:19px}
+    .card{padding:16px 15px}
+    .cap-body{padding:14px 14px}
+    .step{padding:15px 14px}
+    pre{font-size:12px;padding:12px 13px}
+    .metrics{grid-template-columns:repeat(2,1fr);gap:10px}
+    .metric .num{font-size:1.45rem}
+    table{font-size:12.5px}
+    th,td{padding:9px 10px}
+    .quote-block{padding:13px 15px;font-size:14.5px}
+    .credits-name{font-size:1.2rem}
+    #toTop{width:44px;height:44px;font-size:18px;bottom:16px;right:14px}
+  }
+  @media (max-width:400px){
+    body{font-size:14.5px}
+    .metrics{grid-template-columns:1fr 1fr}
+    .metric .num{font-size:1.3rem}
+    .navbtn{font-size:10.5px;padding:6px 9px}
+    main{padding:74px 11px 55px}
+    h1.hero-title{font-size:1.55rem}
+    .chip{font-size:10px;padding:2px 8px}
+  }
+  /* ============ REDUCED MOTION ============ */
+  @media (prefers-reduced-motion:reduce){
+    *{animation-duration:.001ms !important;animation-iteration-count:1 !important;transition-duration:.001ms !important}
+    .section{animation:none}
+  }
+</style>
+</head>
+<body>
+
+<div id="progressWrap"><div id="progressBar"></div></div>
+
+<nav id="navbar">
+  <div id="navScroll">
+    <button class="navbtn active" data-target="inicio">Inicio</button>
+    <button class="navbtn" data-target="intro">Introducción</button>
+    <button class="navbtn" data-target="requisitos">Requisitos</button>
+    <button class="navbtn" data-target="windows">Windows 11</button>
+    <button class="navbtn" data-target="instalacion">Instalación</button>
+    <button class="navbtn" data-target="configuracion">Configuración</button>
+    <button class="navbtn" data-target="capacidades1">Capacidades I</button>
+    <button class="navbtn" data-target="capacidades2">Capacidades II</button>
+    <button class="navbtn" data-target="ejemplos">Ejemplos</button>
+    <button class="navbtn" data-target="ejercicios">Ejercicios</button>
+    <button class="navbtn" data-target="experimentos">Experimentos</button>
+    <button class="navbtn" data-target="proyectos">Proyectos</button>
+    <button class="navbtn" data-target="proyectofinal">Proyecto Final</button>
+    <button class="navbtn" data-target="errores">Errores</button>
+    <button class="navbtn" data-target="seguridad">Seguridad</button>
+    <button class="navbtn" data-target="mantenimiento">Mantenimiento</button>
+    <button class="navbtn" data-target="fuentes">Fuentes</button>
+    <button class="navbtn" data-target="creditos">Créditos</button>
+  </div>
+</nav>
+
+<main>
+
+<!-- ============================================================ HOME -->
+<section class="section active" id="inicio">
+
+  <div id="svgHost">
+    <svg id="heroSvg" viewBox="0 0 800 450" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+      <defs>
+        <radialGradient id="bgG" cx="50%" cy="50%" r="82%">
+          <stop offset="0%" stop-color="#0f172a">
+            <animate attributeName="stop-color" values="#0f172a;#14294a;#0f172a;#101d33;#0f172a" dur="9s" repeatCount="indefinite"/>
+          </stop>
+          <stop offset="55%" stop-color="#0a0e1a">
+            <animate attributeName="stop-color" values="#0a0e1a;#0d1729;#0a0e1a" dur="7.5s" repeatCount="indefinite"/>
+          </stop>
+          <stop offset="100%" stop-color="#070b14"/>
+        </radialGradient>
+
+        <radialGradient id="coreG" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#00d4ff"/>
+          <stop offset="55%" stop-color="#0090b8"/>
+          <stop offset="100%" stop-color="#0a0e1a"/>
+        </radialGradient>
+
+        <linearGradient id="flowG" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="#00d4ff">
+            <animate attributeName="stop-color" values="#00d4ff;#22c55e;#00d4ff" dur="8s" repeatCount="indefinite"/>
+          </stop>
+          <stop offset="100%" stop-color="#a855f7">
+            <animate attributeName="stop-color" values="#a855f7;#00d4ff;#a855f7" dur="8s" repeatCount="indefinite"/>
+          </stop>
+        </linearGradient>
+
+        <filter id="glow" x="-70%" y="-70%" width="240%" height="240%">
+          <feGaussianBlur stdDeviation="3.4" result="b"/>
+          <feMerge>
+            <feMergeNode in="b"/>
+            <feMergeNode in="b"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+
+        <filter id="softGlow" x="-90%" y="-90%" width="280%" height="280%">
+          <feGaussianBlur stdDeviation="7" result="b"/>
+          <feMerge>
+            <feMergeNode in="b"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+
+        <pattern id="gridP" width="34" height="34" patternUnits="userSpaceOnUse">
+          <path d="M34 0 L0 0 0 34" fill="none" stroke="#1e3a5f" stroke-width="0.55"/>
+        </pattern>
+
+        <path id="fp1" d="M400,268 L552,268"/>
+        <path id="fp2" d="M400,268 L478,146"/>
+        <path id="fp3" d="M400,268 L322,146"/>
+        <path id="fp4" d="M400,268 L248,268"/>
+        <path id="fp5" d="M400,268 L322,390"/>
+        <path id="fp6" d="M400,268 L478,390"/>
+      </defs>
+
+      <!-- FONDO -->
+      <rect width="800" height="450" fill="url(#bgG)"/>
+      <rect width="800" height="450" fill="url(#gridP)" opacity="0.34">
+        <animate attributeName="opacity" values="0.18;0.44;0.18" dur="6s" repeatCount="indefinite"/>
+      </rect>
+
+      <!-- ANILLOS ORBITALES -->
+      <g opacity="0.5">
+        <circle cx="400" cy="268" r="112" fill="none" stroke="#00d4ff" stroke-width="0.9"
+                stroke-dasharray="6 14 3 10" opacity="0.7">
+          <animateTransform attributeName="transform" type="rotate" from="0 400 268" to="360 400 268" dur="26s" repeatCount="indefinite"/>
+          <animate attributeName="stroke-dasharray" values="6 14 3 10;12 6 4 16;6 14 3 10" dur="9s" repeatCount="indefinite"/>
+        </circle>
+        <circle cx="400" cy="268" r="148" fill="none" stroke="#a855f7" stroke-width="0.85"
+                stroke-dasharray="4 18 8 12" opacity="0.6">
+          <animateTransform attributeName="transform" type="rotate" from="360 400 268" to="0 400 268" dur="34s" repeatCount="indefinite"/>
+          <animate attributeName="stroke-dasharray" values="4 18 8 12;10 8 3 20;4 18 8 12" dur="11s" repeatCount="indefinite"/>
+        </circle>
+        <circle cx="400" cy="268" r="184" fill="none" stroke="#22c55e" stroke-width="0.7"
+                stroke-dasharray="2 22 6 16" opacity="0.45">
+          <animateTransform attributeName="transform" type="rotate" from="0 400 268" to="360 400 268" dur="44s" repeatCount="indefinite"/>
+          <animate attributeName="stroke-dasharray" values="2 22 6 16;8 12 4 24;2 22 6 16" dur="13s" repeatCount="indefinite"/>
+        </circle>
+      </g>
+
+      <!-- HALO CENTRAL -->
+      <circle cx="400" cy="268" r="46" fill="none" stroke="#00d4ff" stroke-width="1.4" opacity="0.55" filter="url(#softGlow)">
+        <animate attributeName="r" values="42;60;42" dur="4s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" values="0.5;0.12;0.5" dur="4s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="400" cy="268" r="30" fill="none" stroke="#a855f7" stroke-width="1.1" opacity="0.4">
+        <animate attributeName="r" values="28;40;28" dur="3.2s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" values="0.42;0.1;0.42" dur="3.2s" repeatCount="indefinite"/>
+      </circle>
+
+      <!-- CONEXIONES -->
+      <g stroke="url(#flowG)" stroke-width="1.6" fill="none" opacity="0.72" filter="url(#glow)">
+        <path d="M400,268 L552,268" stroke-dasharray="8 12">
+          <animate attributeName="stroke-dashoffset" from="0" to="-40" dur="2.4s" repeatCount="indefinite"/>
+        </path>
+        <path d="M400,268 L478,146" stroke-dasharray="8 12">
+          <animate attributeName="stroke-dashoffset" from="0" to="-40" dur="2.9s" repeatCount="indefinite"/>
+        </path>
+        <path d="M400,268 L322,146" stroke-dasharray="8 12">
+          <animate attributeName="stroke-dashoffset" from="0" to="-40" dur="3.3s" repeatCount="indefinite"/>
+        </path>
+        <path d="M400,268 L248,268" stroke-dasharray="8 12">
+          <animate attributeName="stroke-dashoffset" from="0" to="-40" dur="2.7s" repeatCount="indefinite"/>
+        </path>
+        <path d="M400,268 L322,390" stroke-dasharray="8 12">
+          <animate attributeName="stroke-dashoffset" from="0" to="-40" dur="3.6s" repeatCount="indefinite"/>
+        </path>
+        <path d="M400,268 L478,390" stroke-dasharray="8 12">
+          <animate attributeName="stroke-dashoffset" from="0" to="-40" dur="3.1s" repeatCount="indefinite"/>
+        </path>
+      </g>
+
+      <!-- PARTÍCULAS VIAJERAS -->
+      <g filter="url(#glow)">
+        <circle r="3.6" fill="#00d4ff">
+          <animateMotion dur="2.4s" repeatCount="indefinite" rotate="auto"><mpath href="#fp1"/></animateMotion>
+          <animate attributeName="opacity" values="0;1;1;0" dur="2.4s" repeatCount="indefinite"/>
+        </circle>
+        <circle r="3" fill="#22c55e">
+          <animateMotion dur="2.9s" begin="0.4s" repeatCount="indefinite" rotate="auto"><mpath href="#fp2"/></animateMotion>
+          <animate attributeName="opacity" values="0;1;1;0" dur="2.9s" begin="0.4s" repeatCount="indefinite"/>
+        </circle>
+        <circle r="3.4" fill="#a855f7">
+          <animateMotion dur="3.3s" begin="0.9s" repeatCount="indefinite" rotate="auto"><mpath href="#fp3"/></animateMotion>
+          <animate attributeName="opacity" values="0;1;1;0" dur="3.3s" begin="0.9s" repeatCount="indefinite"/>
+        </circle>
+        <circle r="3.1" fill="#f59e0b">
+          <animateMotion dur="2.7s" begin="0.2s" repeatCount="indefinite" rotate="auto"><mpath href="#fp4"/></animateMotion>
+          <animate attributeName="opacity" values="0;1;1;0" dur="2.7s" begin="0.2s" repeatCount="indefinite"/>
+        </circle>
+        <circle r="3.3" fill="#ef4444">
+          <animateMotion dur="3.6s" begin="1.2s" repeatCount="indefinite" rotate="auto"><mpath href="#fp5"/></animateMotion>
+          <animate attributeName="opacity" values="0;1;1;0" dur="3.6s" begin="1.2s" repeatCount="indefinite"/>
+        </circle>
+        <circle r="3.5" fill="#00d4ff">
+          <animateMotion dur="3.1s" begin="0.7s" repeatCount="indefinite" rotate="auto"><mpath href="#fp6"/></animateMotion>
+          <animate attributeName="opacity" values="0;1;1;0" dur="3.1s" begin="0.7s" repeatCount="indefinite"/>
+        </circle>
+      </g>
+
+      <!-- GHOST ELEMENTS (viaje de ida y vuelta) -->
+      <g opacity="0.65">
+        <circle r="6" fill="none" stroke="#00d4ff" stroke-width="1.3">
+          <animateMotion dur="5.4s" repeatCount="indefinite" keyPoints="0;1;1;0" keyTimes="0;0.45;0.55;1" calcMode="linear"><mpath href="#fp2"/></animateMotion>
+          <animate attributeName="opacity" values="0;0.85;0.85;0" dur="5.4s" repeatCount="indefinite"/>
+        </circle>
+        <circle r="5.5" fill="none" stroke="#a855f7" stroke-width="1.3">
+          <animateMotion dur="6.2s" begin="1.4s" repeatCount="indefinite" keyPoints="0;1;1;0" keyTimes="0;0.45;0.55;1" calcMode="linear"><mpath href="#fp5"/></animateMotion>
+          <animate attributeName="opacity" values="0;0.75;0.75;0" dur="6.2s" begin="1.4s" repeatCount="indefinite"/>
+        </circle>
+      </g>
+
+      <!-- NODO CENTRAL AGENTE -->
+      <g>
+        <circle cx="400" cy="268" r="26" fill="url(#coreG)" filter="url(#softGlow)">
+          <animate attributeName="r" values="25;28;25" dur="3.4s" repeatCount="indefinite"/>
+        </circle>
+        <circle cx="400" cy="268" r="26" fill="none" stroke="#00d4ff" stroke-width="1.5" opacity="0.85">
+          <animate attributeName="r" values="26;34;26" dur="3.4s" repeatCount="indefinite"/>
+          <animate attributeName="opacity" values="0.85;0.18;0.85" dur="3.4s" repeatCount="indefinite"/>
+        </circle>
+        <text x="400" y="273" text-anchor="middle" font-family="'Segoe UI',sans-serif" font-size="12.5" font-weight="800" fill="#04121c" letter-spacing="0.5">IA</text>
+      </g>
+
+      <!-- NODOS PLATAFORMA -->
+      <g font-family="'Segoe UI',sans-serif" font-size="10.5" font-weight="700" text-anchor="middle">
+
+        <g>
+          <circle cx="552" cy="268" r="15" fill="#0f172a" stroke="#22c55e" stroke-width="1.7" filter="url(#glow)">
+            <animateTransform attributeName="transform" type="translate" values="0 0;0 -2.5;0 0" dur="2.6s" repeatCount="indefinite"/>
+            <animate attributeName="stroke-width" values="1.7;2.6;1.7" dur="2.6s" repeatCount="indefinite"/>
+          </circle>
+          <text x="552" y="272" fill="#22c55e" font-size="12">⌥</text>
+          <text x="552" y="298" fill="#94a3b8" font-size="9.5">GITHUB</text>
+        </g>
+
+        <g>
+          <circle cx="478" cy="146" r="15" fill="#0f172a" stroke="#ef4444" stroke-width="1.7" filter="url(#glow)">
+            <animateTransform attributeName="transform" type="translate" values="0 0;0 -2.5;0 0" dur="3.1s" repeatCount="indefinite"/>
+          </circle>
+          <text x="478" y="150" fill="#ef4444" font-size="12">▶</text>
+          <text x="478" y="176" fill="#94a3b8" font-size="9.5">YOUTUBE</text>
+        </g>
+
+        <g>
+          <circle cx="322" cy="146" r="15" fill="#0f172a" stroke="#f59e0b" stroke-width="1.7" filter="url(#glow)">
+            <animateTransform attributeName="transform" type="translate" values="0 0;0 -2.5;0 0" dur="3.6s" repeatCount="indefinite"/>
+          </circle>
+          <text x="322" y="150" fill="#f59e0b" font-size="12">◉</text>
+          <text x="322" y="176" fill="#94a3b8" font-size="9.5">REDDIT</text>
+        </g>
+
+        <g>
+          <circle cx="248" cy="268" r="15" fill="#0f172a" stroke="#00d4ff" stroke-width="1.7" filter="url(#glow)">
+            <animateTransform attributeName="transform" type="translate" values="0 0;0 -2.5;0 0" dur="2.9s" repeatCount="indefinite"/>
+          </circle>
+          <text x="248" y="272" fill="#00d4ff" font-size="12">✦</text>
+          <text x="248" y="298" fill="#94a3b8" font-size="9.5">TWITTER/X</text>
+        </g>
+
+        <g>
+          <circle cx="322" cy="390" r="15" fill="#0f172a" stroke="#a855f7" stroke-width="1.7" filter="url(#glow)">
+            <animateTransform attributeName="transform" type="translate" values="0 0;0 -2.5;0 0" dur="3.4s" repeatCount="indefinite"/>
+          </circle>
+          <text x="322" y="394" fill="#a855f7" font-size="12">◈</text>
+          <text x="322" y="418" fill="#94a3b8" font-size="9.5">BILIBILI</text>
+        </g>
+
+        <g>
+          <circle cx="478" cy="390" r="15" fill="#0f172a" stroke="#22c55e" stroke-width="1.7" filter="url(#glow)">
+            <animateTransform attributeName="transform" type="translate" values="0 0;0 -2.5;0 0" dur="2.4s" repeatCount="indefinite"/>
+          </circle>
+          <text x="478" y="394" fill="#22c55e" font-size="12">❖</text>
+          <text x="478" y="418" fill="#94a3b8" font-size="9.5">XHS</text>
+        </g>
+      </g>
+
+      <!-- ANILLO ORBITANDO AL NODO CENTRAL -->
+      <g>
+        <circle cx="400" cy="268" r="40" fill="none" stroke="#f59e0b" stroke-width="1.2" stroke-dasharray="3 9 5 6" opacity="0.75">
+          <animateTransform attributeName="transform" type="rotate" from="0 400 268" to="360 400 268" dur="14s" repeatCount="indefinite"/>
+        </circle>
+      </g>
+
+      <!-- EXPLOSIONES RADIALES EN NODOS -->
+      <g stroke="#00d4ff" stroke-width="1.4" opacity="0.85" filter="url(#glow)">
+        <g>
+          <line x1="552" y1="268" x2="552" y2="268">
+            <animate attributeName="x1" values="552;568;584" dur="3s" repeatCount="indefinite"/>
+            <animate attributeName="y1" values="268;256;244" dur="3s" repeatCount="indefinite"/>
+            <animate attributeName="opacity" values="0.9;0.5;0" dur="3s" repeatCount="indefinite"/>
+          </line>
+          <line x1="552" y1="268" x2="552" y2="268">
+            <animate attributeName="x1" values="552;568;584" dur="3s" begin="0.4s" repeatCount="indefinite"/>
+            <animate attributeName="y1" values="268;280;292" dur="3s" begin="0.4s" repeatCount="indefinite"/>
+            <animate attributeName="opacity" values="0.9;0.5;0" dur="3s" begin="0.4s" repeatCount="indefinite"/>
+          </line>
+        </g>
+        <g stroke="#a855f7">
+          <line x1="248" y1="268" x2="248" y2="268">
+            <animate attributeName="x1" values="248;232;216" dur="3.5s" repeatCount="indefinite"/>
+            <animate attributeName="y1" values="268;256;244" dur="3.5s" repeatCount="indefinite"/>
+            <animate attributeName="opacity" values="0.9;0.5;0" dur="3.5s" repeatCount="indefinite"/>
+          </line>
+          <line x1="248" y1="268" x2="248" y2="268">
+            <animate attributeName="x1" values="248;232;216" dur="3.5s" begin="0.5s" repeatCount="indefinite"/>
+            <animate attributeName="y1" values="268;280;292" dur="3.5s" begin="0.5s" repeatCount="indefinite"/>
+            <animate attributeName="opacity" values="0.9;0.5;0" dur="3.5s" begin="0.5s" repeatCount="indefinite"/>
+          </line>
+        </g>
+      </g>
+
+      <!-- INDICADOR LIVE -->
+      <g>
+        <rect x="690" y="18" width="92" height="26" rx="13" fill="#0f172a" stroke="#ef4444" stroke-width="1.2" opacity="0.95"/>
+        <circle cx="707" cy="31" r="4.2" fill="#ef4444">
+          <animate attributeName="opacity" values="1;0.2;1" dur="1.2s" repeatCount="indefinite"/>
+          <animate attributeName="r" values="4.2;5.6;4.2" dur="1.2s" repeatCount="indefinite"/>
+        </circle>
+        <text x="722" y="35" font-family="'Segoe UI',sans-serif" font-size="11" font-weight="800" fill="#ef4444" letter-spacing="1.6">LIVE</text>
+      </g>
+
+      <!-- TÍTULO PRINCIPAL -->
+      <text x="400" y="42" text-anchor="middle" font-family="'Segoe UI',sans-serif" font-size="30" font-weight="800" letter-spacing="3.4" fill="#00d4ff" filter="url(#glow)">
+        AGENT REACH
+        <animate attributeName="fill" values="#00d4ff;#a855f7;#22c55e;#00d4ff" dur="8s" repeatCount="indefinite"/>
+      </text>
+      <text x="400" y="66" text-anchor="middle" font-family="'Segoe UI',sans-serif" font-size="12.5" font-weight="600" fill="#94a3b8" letter-spacing="4.4">
+        CONECTANDO TU IA CON EL MUNDO
+        <animate attributeName="opacity" values="0.5;1;0.5" dur="4.4s" repeatCount="indefinite"/>
+      </text>
+
+      <!-- ETIQUETA DE ESTADO ALTERNA -->
+      <g font-family="'Segoe UI',sans-serif" font-size="11" font-weight="700" fill="#22c55e" text-anchor="middle">
+        <text x="400" y="446" letter-spacing="2">
+          <animate attributeName="opacity" values="1;1;0;0;1" dur="8s" repeatCount="indefinite" keyTimes="0;0.42;0.46;0.94;1"/>
+          SISTEMA ONLINE · 15 CAPACIDADES ACTIVAS
+        </text>
+        <text x="400" y="446" letter-spacing="2" fill="#f59e0b">
+          <animate attributeName="opacity" values="0;0;1;1;0" dur="8s" repeatCount="indefinite" keyTimes="0;0.42;0.46;0.94;1"/>
+          DIAGNÓSTICO: agent-reach doctor
+        </text>
+      </g>
+
+      <!-- FLASH CLÍMAX -->
+      <text x="400" y="208" text-anchor="middle" font-family="'Segoe UI',sans-serif" font-size="22" font-weight="900" letter-spacing="6" fill="#f59e0b" filter="url(#glow)" opacity="0">
+        <animate attributeName="opacity" values="0;0;0.95;0;0" dur="7s" repeatCount="indefinite" keyTimes="0;0.78;0.83;0.9;1"/>
+        <animateTransform attributeName="transform" type="translate" values="0 0;0 0;0 -6;0 -10;0 -10" dur="7s" repeatCount="indefinite" keyTimes="0;0.78;0.83;0.9;1"/>
+        READY
+      </text>
+
+      <!-- FIRMA -->
+      <text x="790" y="440" text-anchor="end" font-family="'Segoe UI',sans-serif" font-size="10" fill="#a855f7" font-style="italic" letter-spacing="0.8">
+        Rubén Sbarsky
+        <animate attributeName="opacity" values="0.35;0.95;0.35" dur="5.4s" repeatCount="indefinite"/>
+      </text>
+
+      <!-- ESQUINAS TÉCNICAS -->
+      <g stroke="#1e3a5f" stroke-width="1.3" fill="none" opacity="0.8">
+        <path d="M14,14 L14,40 M14,14 L40,14"/>
+        <path d="M786,14 L786,40 M786,14 L760,14"/>
+        <path d="M14,436 L14,410 M14,436 L40,436"/>
+        <path d="M786,436 L786,410 M786,436 L760,436"/>
+      </g>
+    </svg>
+  </div>
+
+  <span class="badge-top">Tutorial técnico · Windows 11</span>
+  <h1 class="hero-title">Agent Reach desde cero en Windows 11</h1>
+  <p class="hero-sub">Instala, configura y domina las 15 capacidades que conectan tu agente de inteligencia artificial con internet y las redes sociales.</p>
+  <p class="hero-desc">Un recorrido completo, paso a paso, desde la preparación de Windows 11 hasta un proyecto final de vigilancia informativa combinando varias capacidades. Sin necesidad de saber programar.</p>
+
+  <div class="quote-block">
+    "Si no puedes explicarlo de forma sencilla, es que no lo entiendes lo suficientemente bien."
+  </div>
+
+  <div class="metrics">
+    <div class="metric"><span class="num">15</span><span class="lbl">Capacidades</span></div>
+    <div class="metric"><span class="num">19</span><span class="lbl">Pasos guiados</span></div>
+    <div class="metric"><span class="num">1.5.0</span><span class="lbl">Versión ref.</span></div>
+    <div class="metric"><span class="num">7</span><span class="lbl">Zero-config</span></div>
+  </div>
+
+  <div class="datetime-box">
+    <div><span>Fecha:</span> <b>18/09/2026</b></div>
+    <div><span>Hora:</span> <b>06:25:16</b></div>
+    <div><span>Créditos:</span> <b>Rubén Sbarsky</b></div>
+  </div>
+
+  <div class="callout info" style="margin-top:26px">
+    <span class="ct">Info</span>
+    Todo lo que aparece en este tutorial — comandos, nombres de archivos, rutas y capacidades — ha sido comprobado directamente en el repositorio oficial: README, <code>docs/install.md</code>, <code>docs/update.md</code>, <code>docs/troubleshooting.md</code>, <code>docs/cookie-export.md</code>, <code>CLAUDE.md</code>, <code>SECURITY.md</code>, <code>CHANGELOG.md</code>, <code>.env.example</code>, <code>pyproject.toml</code>, <code>constraints.txt</code>, el código del CLI y la referencia de comandos incluida en el propio proyecto. Cuando la documentación no aclaraba algo, se indica explícitamente en vez de inventarlo.
+  </div>
+
+</section>
+
+<!-- ============================================================ INTRO -->
+<section class="section" id="intro">
+  <div class="sec-head">
+    <div class="sec-icon">🎯</div>
+    <h2>Introducción: qué vamos a conseguir</h2>
+  </div>
+
+  <p>Al terminar este tutorial vas a tener, en tu propio ordenador con Windows 11:</p>
+  <ol>
+    <li>Un ordenador preparado con todo lo que Agent Reach necesita para funcionar.</li>
+    <li>Agent Reach instalado y comprobado con su propio "chequeo médico" (<code>agent-reach doctor</code>).</li>
+    <li>Tu primer resultado real: tu agente de IA leyendo una página web y un repositorio de GitHub sin que tú hayas escrito ni una línea de código.</li>
+    <li>Entendimiento de <strong>qué hace cada una de las 15 capacidades</strong> que Agent Reach ofrece hoy, con ejemplos que puedes copiar y ejecutar.</li>
+    <li>Capacidad para diagnosticar y arreglar los problemas más comunes.</li>
+    <li>Un pequeño proyecto final en el que combinas varias capacidades para conseguir algo útil de verdad.</li>
+  </ol>
+  <p>No hace falta que sepas programar. Vamos a construir todo paso a paso, comprobando en cada momento que lo que hicimos funcionó antes de seguir.</p>
+
+  <div class="callout info">
+    <span class="ct">Contexto de la investigación</span>
+    <p style="margin-bottom:6px"><strong>Fecha de la investigación:</strong> 18 de septiembre de 2026.</p>
+    <p style="margin-bottom:6px"><strong>Rama consultada:</strong> <code>main</code> del repositorio <a href="https://github.com/Panniantong/Agent-Reach" target="_blank" rel="noopener">Panniantong/Agent-Reach</a>.</p>
+    <p style="margin-bottom:0"><strong>Versión de referencia:</strong> <code>1.5.0</code> (declarada en <code>pyproject.toml</code>), que corresponde a la última <em>release</em> oficial etiquetada (<code>v1.5.0</code>, publicada el 11/06/2026).</p>
+  </div>
+
+  <div class="callout warn">
+    <span class="ct">Aviso importante</span>
+    En la rama <code>main</code> hay cambios posteriores a esa <em>release</em> que todavía no se han empaquetado en una versión nueva (por ejemplo, un canal experimental para la web china de empleo Boss直聘). Este tutorial se basa en lo que está <strong>documentado oficialmente en el README</strong> y confirmado en el código de <code>main</code>. Cuando algo esté en desarrollo pero no sea oficial todavía, se indicará explícitamente en vez de presentarlo como una función terminada.
+  </div>
+
+  <h3>Qué es Agent Reach</h3>
+  <p>Agent Reach no es una aplicación con ventanas ni un programa que tú manejas directamente. Es una <strong>caja de herramientas para tu agente de inteligencia artificial</strong> (por ejemplo Claude Code, Cursor, Windsurf o cualquier otro agente que pueda ejecutar comandos en una terminal).</p>
+
+  <h4>El problema que resuelve</h4>
+  <p>Un agente de IA normal, si le pides "búscame en Reddit si alguien ha tenido este mismo error" o "resume este vídeo de YouTube", no puede hacerlo por sí solo. Cada plataforma (Twitter, Reddit, YouTube, GitHub, Bilibili, XiaoHongShu...) tiene sus propias barreras: APIs de pago, bloqueos a servidores, necesidad de iniciar sesión, páginas que devuelven código HTML ilegible en vez de texto limpio.</p>
+
+  <h4>Lo que hace Agent Reach</h4>
+  <p>En vez de que tú (o tu agente) tengáis que investigar, instalar y configurar una herramienta distinta para cada plataforma, Agent Reach:</p>
+  <ul>
+    <li><strong>Elige</strong> la mejor herramienta disponible para leer o buscar en cada plataforma.</li>
+    <li><strong>La instala</strong> en tu ordenador.</li>
+    <li><strong>Comprueba</strong> que funciona de verdad (no solo que el programa esté instalado, sino que responde).</li>
+    <li>Si una herramienta deja de funcionar porque la plataforma cambió algo, <strong>la sustituye</strong> por otra sin que tengas que hacer nada.</li>
+  </ul>
+  <p>Una vez instalado, tu agente de IA llama directamente a esas herramientas (por ejemplo <code>gh</code>, <code>yt-dlp</code>, <code>bili</code>, <code>twitter</code>). Agent Reach no se pone en medio de cada lectura: solo se encarga de dejarlo todo listo y de decirte, con el comando <code>agent-reach doctor</code>, qué funciona y qué no.</p>
+
+  <div class="callout info">
+    <span class="ct">Definición · Terminal</span>
+    Una <strong>terminal</strong> es una ventana en la que le puedes escribir instrucciones de texto al ordenador, y el ordenador te responde también con texto. En Windows 11 la terminal que vamos a usar se llama <strong>PowerShell</strong>.
+  </div>
+
+  <h3>Cómo funciona explicado de forma sencilla</h3>
+  <p>Cuando le pides algo a tu agente de IA que necesita internet, esto es lo que pasa por dentro:</p>
+
+  <div class="flow">
+Tú
+  ↓  ("resume este vídeo de YouTube")
+Tu agente de IA (Claude Code, Cursor, etc.)
+  ↓
+Agent Reach ya dejó instalada y comprobada la herramienta correcta
+  ↓
+Herramienta real (por ejemplo yt-dlp para YouTube)
+  ↓
+Plataforma externa (YouTube)
+  ↓
+Resultado (el texto del vídeo) que tu agente te resume
+  </div>
+
+  <p>Agent Reach solo interviene en la parte de "dejarlo instalado y comprobado". La lectura real de cada página, vídeo o red social la hace directamente la herramienta correspondiente, llamada por tu agente.</p>
+  <p>Cada plataforma tiene una <strong>lista ordenada de herramientas candidatas</strong>: una primera opción y, si falla, una de reserva. Por ejemplo, para Bilibili la primera opción es <code>bili-cli</code> y la de reserva es <code>OpenCLI</code>. El comando <code>agent-reach doctor</code> te dice siempre cuál está usando cada plataforma en este momento.</p>
+</section>
+
+<!-- ============================================================ REQUISITOS -->
+<section class="section" id="requisitos">
+  <div class="sec-head">
+    <div class="sec-icon">📋</div>
+    <h2>Requisitos</h2>
+  </div>
+
+  <p>Antes de instalar nada, aquí tienes la lista completa de lo que Agent Reach necesita en Windows 11, verificada en la documentación oficial. No vamos a instalar nada que Agent Reach no necesite.</p>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead>
+        <tr><th>Herramienta</th><th>¿Obligatoria?</th><th>¿Para qué la necesita Agent Reach?</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>Python 3.10 o superior</strong></td><td><span class="chip chip-green">Sí, siempre</span></td><td>Agent Reach está escrito en Python; es el programa que lo ejecuta</td></tr>
+        <tr><td><strong>pip</strong></td><td><span class="chip chip-green">Sí, siempre</span></td><td>Viene incluido con Python; sirve para instalar el propio Agent Reach</td></tr>
+        <tr><td><strong>pipx</strong></td><td><span class="chip chip-amber">Recomendado</span></td><td>Instala herramientas de línea de comandos en un espacio aislado, sin mezclar dependencias (no estrictamente obligatorio)</td></tr>
+        <tr><td><strong>Node.js + npm</strong></td><td><span class="chip chip-green">Sí, para búsqueda web y varias redes</span></td><td><code>mcporter</code> (buscador Exa) y <code>OpenCLI</code> (Reddit, Facebook, Instagram, XiaoHongShu de escritorio, subtítulos de Bilibili) son herramientas npm</td></tr>
+        <tr><td><strong>gh CLI (GitHub)</strong></td><td><span class="chip chip-green">Sí, para GitHub</span></td><td>Es la herramienta oficial de GitHub que Agent Reach usa para leer y buscar repositorios</td></tr>
+        <tr><td><strong>Git</strong></td><td><span class="chip chip-amber">Solo para Reddit opcional</span></td><td>La herramienta <code>rdt-cli</code> se instala directamente desde su código fuente en GitHub, y eso requiere Git</td></tr>
+        <tr><td><strong>ffmpeg</strong></td><td><span class="chip chip-amber">Solo para Xiaoyuzhou</span></td><td>Se necesita para preparar el audio antes de transcribirlo</td></tr>
+        <tr><td><strong>uv / uvx</strong></td><td><span class="chip chip-amber">Solo para LinkedIn</span></td><td>El servicio de LinkedIn se instala y ejecuta con <code>uvx</code></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout info">
+    <span class="ct">Nota</span>
+    La documentación oficial consultada no especifica una cantidad mínima de RAM, espacio en disco ni versión concreta de Windows 11 (Home/Pro/build). Se asume una instalación estándar y actualizada de Windows 11.
+  </div>
+
+  <p>En el siguiente paso vamos a comprobar, uno por uno, cuáles de estos ya tienes y cuáles hay que instalar.</p>
+</section>
+
+<!-- ============================================================ WINDOWS 11 -->
+<section class="section" id="windows">
+  <div class="sec-head">
+    <div class="sec-icon">🪟</div>
+    <h2>Preparar Windows 11</h2>
+  </div>
+
+  <p>En esta sección vamos a comprobar e instalar, uno por uno, cada requisito. Vamos a usar <strong>PowerShell</strong> como terminal. En Windows 11 la abres así: pulsa el botón de inicio, escribe <code>PowerShell</code> y pulsa Entrar sobre "Windows PowerShell".</p>
+
+  <div class="callout info">
+    <span class="ct">Definición · Variable de entorno</span>
+    Es un valor que el sistema operativo guarda en memoria y que los programas pueden leer. Por ejemplo, más adelante guardaremos ahí una contraseña temporal de acceso a Twitter. No hace falta entenderlo del todo ahora; lo explicaremos cuando lo usemos por primera vez.
+  </div>
+
+  <!-- PASO 1 -->
+  <div class="step">
+    <div class="step-head">
+      <span class="step-num">PASO 1</span>
+      <h4>Comprobar si ya tienes Python instalado</h4>
+    </div>
+    <div class="step-sub">Qué vamos a hacer</div>
+    <p>Preguntarle a Windows si ya existe una instalación de Python utilizable.</p>
+    <div class="step-sub">Por qué</div>
+    <p>Windows 11 a veces trae un "acceso directo" a Python en la Microsoft Store que <strong>no es una instalación real</strong>. Necesitamos distinguir entre ambos casos antes de seguir.</p>
+    <div class="step-sub">Acción</div>
+    <pre><code>py -3 --version</code></pre>
+    <div class="step-sub">Qué debería ocurrir</div>
+    <p>Si Python ya está instalado correctamente, verás algo como:</p>
+    <pre><code>Python 3.12.4</code></pre>
+    <p>Si en vez de eso se abre automáticamente la Microsoft Store, significa que no tienes Python instalado todavía: lo que existía era solo un acceso directo. Ve al PASO 2.</p>
+    <div class="step-sub">Prueba</div>
+    <p>El número de versión debe ser <code>3.10</code> o superior. Si es menor, también necesitas instalar una versión más reciente (PASO 2).</p>
+    <div class="step-sub">Si no ocurre</div>
+    <p>Si el comando da un error de "no se reconoce como comando", prueba también con:</p>
+    <pre><code>python --version</code></pre>
+    <p>Si ninguno de los dos comandos funciona, o si abren la Microsoft Store, continúa con el PASO 2.</p>
+  </div>
+
+  <!-- PASO 2 -->
+  <div class="step">
+    <div class="step-head">
+      <span class="step-num">PASO 2</span>
+      <h4>Instalar Python 3.10 o superior</h4>
+    </div>
+    <div class="step-sub">Qué vamos a hacer</div>
+    <p>Descargar e instalar la versión oficial de Python desde python.org.</p>
+    <div class="step-sub">Por qué</div>
+    <p>La documentación oficial de Agent Reach advierte específicamente de este problema en Windows: si <code>python3</code> abre la Microsoft Store, o si <code>where python3</code> apunta a una ruta dentro de <code>...\AppData\Local\Microsoft\WindowsApps\python3.exe</code>, esa versión <strong>no sirve</strong>: es un alias vacío de la Store, no una instalación real. Por eso instalamos Python directamente desde la fuente oficial.</p>
+    <div class="step-sub">Acción</div>
+    <ol>
+      <li>Abre tu navegador y entra en <a href="https://www.python.org/downloads/" target="_blank" rel="noopener">https://www.python.org/downloads/</a></li>
+      <li>Descarga la versión más reciente de Python 3 para Windows.</li>
+      <li>Ejecuta el instalador descargado.</li>
+      <li><strong>Muy importante:</strong> en la primera pantalla del instalador, marca la casilla <strong>"Add python.exe to PATH"</strong> antes de pulsar "Install Now". Esto permite que la terminal encuentre Python.</li>
+    </ol>
+    <div class="step-sub">Qué debería ocurrir</div>
+    <p>El instalador termina y muestra un mensaje de instalación completada.</p>
+    <div class="step-sub">Prueba</div>
+    <p>Cierra PowerShell por completo y ábrelo de nuevo (los cambios de PATH no se aplican en la ventana ya abierta). Ejecuta:</p>
+    <pre><code>py -3 --version</code></pre>
+    <p>Debe mostrar <code>Python 3.10.x</code> o una versión superior.</p>
+    <div class="step-sub">Si no ocurre</div>
+    <p>Si sigue sin reconocerse, vuelve a ejecutar el instalador de python.org, elige "Modify" y comprueba que la casilla de PATH quedó marcada.</p>
+  </div>
+
+  <!-- PASO 3 -->
+  <div class="step">
+    <div class="step-head">
+      <span class="step-num">PASO 3</span>
+      <h4>Comprobar que pip funciona</h4>
+    </div>
+    <div class="step-sub">Qué vamos a hacer</div>
+    <p>Verificar que la herramienta <code>pip</code> (el instalador de paquetes de Python) está disponible.</p>
+    <div class="step-sub">Por qué</div>
+    <p><code>pip</code> viene incluido con Python, pero conviene confirmarlo porque es la herramienta que usaremos para instalar el propio Agent Reach.</p>
+    <div class="step-sub">Acción</div>
+    <pre><code>py -3 -m pip --version</code></pre>
+    <div class="step-sub">Qué debería ocurrir</div>
+    <p>Una línea con un número de versión de pip, por ejemplo <code>pip 24.0 from ...</code>.</p>
+    <div class="step-sub">Prueba</div>
+    <p>Que aparezca un número de versión sin mensaje de error.</p>
+    <div class="step-sub">Si no ocurre</div>
+    <p>Repite el instalador de Python del PASO 2 y asegúrate de no haber desmarcado "pip" en las opciones de componentes (viene marcada por defecto).</p>
+  </div>
+
+  <!-- PASO 4 -->
+  <div class="step">
+    <div class="step-head">
+      <span class="step-num">PASO 4</span>
+      <h4>Instalar pipx</h4>
+    </div>
+    <div class="step-sub">Qué vamos a hacer</div>
+    <p>Instalar <code>pipx</code>, la forma recomendada por Agent Reach de instalar su propio comando de línea de órdenes.</p>
+    <div class="step-sub">Por qué</div>
+    <p>Cuando instalas un programa de Python con <code>pip</code> a secas, sus dependencias se mezclan con las de todo lo demás en tu sistema, y eso puede romper otras cosas con el tiempo. <code>pipx</code> instala cada herramienta en su propio compartimento aislado. El propio <code>install.md</code> de Agent Reach lo recomienda como opción "más cómoda" (<em>más省心</em>, la que menos preocupaciones da).</p>
+    <div class="step-sub">Acción</div>
+    <pre><code>py -3 -m pip install --user pipx
+py -3 -m pipx ensurepath</code></pre>
+    <div class="step-sub">Qué debería ocurrir</div>
+    <p>Ambos comandos terminan sin errores. El segundo comando añade la carpeta de pipx a tu PATH.</p>
+    <div class="step-sub">Prueba</div>
+    <p>Cierra y vuelve a abrir PowerShell, y ejecuta:</p>
+    <pre><code>pipx --version</code></pre>
+    <p>Debe mostrar un número de versión.</p>
+    <div class="step-sub">Si no ocurre</div>
+    <p>Si <code>pipx</code> no se reconoce tras reiniciar la terminal, ejecuta de nuevo <code>py -3 -m pipx ensurepath</code> y reinicia PowerShell otra vez. La documentación oficial consultada no especifica pasos adicionales para este caso concreto en Windows.</p>
+  </div>
+
+  <h3>Instalar las herramientas necesarias</h3>
+  <p>Ahora instalamos el resto de piezas que Agent Reach necesita para sus capacidades zero-config (sin configuración): Node.js (para búsqueda web y varias redes sociales) y GitHub CLI (para la capacidad de GitHub).</p>
+
+  <!-- PASO 5 -->
+  <div class="step">
+    <div class="step-head">
+      <span class="step-num">PASO 5</span>
+      <h4>Comprobar e instalar Node.js</h4>
+    </div>
+    <div class="step-sub">Qué vamos a hacer</div>
+    <p>Comprobar si tienes Node.js instalado y, si no, instalarlo.</p>
+    <div class="step-sub">Por qué</div>
+    <p>Dos piezas clave de Agent Reach —<code>mcporter</code> (que activa la búsqueda semántica en toda la web) y <code>OpenCLI</code> (que da acceso a Reddit, Facebook, Instagram, XiaoHongShu de escritorio y subtítulos de Bilibili)— son programas basados en Node.js. El propio instalador de Agent Reach comprueba la presencia de Node.js como parte de la infraestructura básica.</p>
+    <div class="step-sub">Acción</div>
+    <pre><code>node --version
+npm --version</code></pre>
+    <p>Si ambos comandos devuelven un número de versión, ya tienes Node.js y puedes saltar al PASO 6.</p>
+    <p>Si no:</p>
+    <ol>
+      <li>Ve a <a href="https://nodejs.org/" target="_blank" rel="noopener">https://nodejs.org/</a></li>
+      <li>Descarga la versión <strong>LTS</strong> (la recomendada para la mayoría de usuarios).</li>
+      <li>Ejecuta el instalador y sigue las pantallas con las opciones por defecto.</li>
+    </ol>
+    <div class="step-sub">Qué debería ocurrir</div>
+    <p>Tras instalar, ambos comandos muestran un número de versión, por ejemplo <code>v20.14.0</code> y <code>10.7.0</code>.</p>
+    <div class="step-sub">Prueba</div>
+    <pre><code>node --version
+npm --version</code></pre>
+    <p>Ambos deben responder sin error tras cerrar y reabrir PowerShell.</p>
+    <div class="step-sub">Si no ocurre</div>
+    <p>Repite la instalación asegurándote de descargar el instalador <code>.msi</code> oficial de nodejs.org, no una copia de otra web.</p>
+  </div>
+
+  <!-- PASO 6 -->
+  <div class="step">
+    <div class="step-head">
+      <span class="step-num">PASO 6</span>
+      <h4>Comprobar e instalar GitHub CLI (<code>gh</code>)</h4>
+    </div>
+    <div class="step-sub">Qué vamos a hacer</div>
+    <p>Comprobar si tienes instalada la herramienta oficial de GitHub para la terminal y, si no, instalarla.</p>
+    <div class="step-sub">Por qué</div>
+    <p>La capacidad de leer y buscar en GitHub funciona a través de <code>gh</code>, la herramienta oficial de línea de comandos de GitHub. Es zero-config para repositorios públicos.</p>
+    <div class="step-sub">Acción</div>
+    <pre><code>gh --version</code></pre>
+    <p>Si no está instalado, la forma más simple en Windows 11 es usar el instalador de aplicaciones incluido en el sistema (<code>winget</code>):</p>
+    <pre><code>winget install --id GitHub.cli</code></pre>
+    <div class="step-sub">Qué debería ocurrir</div>
+    <p><code>gh --version</code> muestra algo como <code>gh version 2.55.0</code>.</p>
+    <div class="step-sub">Prueba</div>
+    <p>Cierra y reabre PowerShell y repite:</p>
+    <pre><code>gh --version</code></pre>
+    <div class="step-sub">Si no ocurre</div>
+    <p>Si <code>winget</code> no está disponible en tu equipo, descarga el instalador manualmente desde <a href="https://cli.github.com" target="_blank" rel="noopener">https://cli.github.com</a> y ejecútalo.</p>
+    <div class="callout warn">
+      <span class="ct">Nota sobre Git y ffmpeg</span>
+      No los instalamos todavía porque no son necesarios para el núcleo de Agent Reach. Los instalaremos más adelante, solo si decides activar Reddit (Git) o la transcripción de podcasts (ffmpeg).
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ INSTALACIÓN -->
+<section class="section" id="instalacion">
+  <div class="sec-head">
+    <div class="sec-icon">⚙️</div>
+    <h2>Descargar, instalar y probar Agent Reach</h2>
+  </div>
+
+  <p><strong>Instalar</strong> y <strong>descargar</strong> van juntos en este caso: el comando <code>pip install</code> descarga el código de Agent Reach directamente desde GitHub y lo instala en un solo paso. No hace falta usar Git ni "clonar" nada para tener Agent Reach funcionando: eso solo sería necesario si quisieras modificar su código fuente, algo que este tutorial no cubre.</p>
+
+  <!-- PASO 7 -->
+  <div class="step">
+    <div class="step-head">
+      <span class="step-num">PASO 7</span>
+      <h4>Descargar e instalar el comando <code>agent-reach</code></h4>
+    </div>
+    <div class="step-sub">Qué vamos a hacer</div>
+    <p>Instalar el programa <code>agent-reach</code> en tu sistema usando <code>pipx</code>.</p>
+    <div class="step-sub">Por qué</div>
+    <p><code>pipx</code> (que instalamos en el PASO 4) mantiene esta herramienta aislada del resto de tu sistema.</p>
+    <div class="step-sub">Acción</div>
+    <pre><code>pipx install https://github.com/Panniantong/agent-reach/archive/main.zip</code></pre>
+    <div class="callout warn">
+      <span class="ct">Advertencia</span>
+      Si tu Python viene de Microsoft Store o de otro sitio no oficial y ves un error de tipo <code>externally-managed-environment</code> (PEP 668), es una protección del propio Python, no un fallo de Agent Reach. La solución sigue siendo <code>pipx</code>, como en el comando de arriba; si por algún motivo tampoco funciona, la alternativa documentada es crear un entorno virtual:
+      <pre style="margin-top:10px"><code>py -3 -m venv $env:USERPROFILE\.agent-reach-venv
+$env:USERPROFILE\.agent-reach-venv\Scripts\Activate.ps1
+python -m pip install https://github.com/Panniantong/agent-reach/archive/main.zip</code></pre>
+    </div>
+    <div class="step-sub">Qué debería ocurrir</div>
+    <p>Verás varias líneas de descarga y, al final, un mensaje similar a:</p>
+    <pre><code>  installed package agent-reach 1.5.0, installed using Python 3.12.4
+  These apps are now globally available
+    - agent-reach
+done! ✨ 🌟 ✨</code></pre>
+    <div class="step-sub">Prueba</div>
+    <pre><code>agent-reach --version</code></pre>
+    <p>Debe responder con algo como <code>Agent Reach v1.5.0</code> (o una versión posterior).</p>
+    <div class="step-sub">Si no ocurre</div>
+    <ul>
+      <li>Si <code>agent-reach</code> no se reconoce como comando: cierra y reabre PowerShell (pipx necesita añadir su carpeta al PATH, igual que en el PASO 4).</li>
+      <li>Si ves un error de red: comprueba tu conexión a internet y que <code>github.com</code> no esté bloqueado por un firewall o antivirus.</li>
+    </ul>
+  </div>
+
+  <!-- PASO 8 -->
+  <div class="step">
+    <div class="step-head">
+      <span class="step-num">PASO 8</span>
+      <h4>Ejecutar la comprobación de solo lectura</h4>
+    </div>
+    <div class="step-sub">Qué vamos a hacer</div>
+    <p>Pedirle a Agent Reach que revise tu sistema sin cambiar nada todavía.</p>
+    <div class="step-sub">Por qué</div>
+    <p>Así puedes ver qué falta antes de autorizar ningún cambio. Por defecto, <code>agent-reach install</code> <strong>solo mira</strong>, no cambia nada en tu sistema. Hace falta añadir <code>--system</code> explícitamente para que instale o configure algo. Esto es una medida de seguridad deliberada del proyecto.</p>
+    <div class="step-sub">Acción</div>
+    <pre><code>agent-reach install --env=auto</code></pre>
+    <div class="step-sub">Qué debería ocurrir</div>
+    <p>Un informe de texto que repasa: <code>gh</code> CLI, Node.js, <code>mcporter</code>, configuración de <code>yt-dlp</code>, y te dice qué falta.</p>
+    <div class="step-sub">Prueba</div>
+    <p>Que el comando termine sin errores de Python (tracebacks). Los avisos de "falta tal cosa" son normales en esta fase: son solo información.</p>
+    <div class="step-sub">Si no ocurre</div>
+    <p>Si ves un error de Python, repite los pasos 1 a 3 (verificación de Python/pip) antes de continuar.</p>
+  </div>
+
+  <!-- PASO 9 -->
+  <div class="step">
+    <div class="step-head">
+      <span class="step-num">PASO 9</span>
+      <h4>Autorizar la instalación real de las piezas básicas</h4>
+    </div>
+    <div class="step-sub">Qué vamos a hacer</div>
+    <p>Autorizar explícitamente a Agent Reach para que instale y configure las piezas zero-config: lector web (Jina Reader), YouTube, GitHub, RSS, búsqueda Exa, V2EX y Bilibili básico.</p>
+    <div class="step-sub">Por qué</div>
+    <p>Estas siete capacidades no necesitan ninguna cuenta ni contraseña, así que se activan todas de una vez con tu autorización.</p>
+    <div class="step-sub">Acción</div>
+    <pre><code>agent-reach install --env=auto --system</code></pre>
+    <div class="step-sub">Qué debería ocurrir</div>
+    <p>Verás un proceso más largo que el PASO 8: instala/comprueba <code>mcporter</code>, activa Exa a través de MCP (sin necesidad de clave), y al final te pregunta si quieres activar canales adicionales que necesitan inicio de sesión (Twitter, XiaoHongShu, Reddit, Facebook, Instagram). <strong>Por ahora responde que no</strong> a esos opcionales — los activaremos uno a uno en la sección de capacidades, cuando entendamos cada uno.</p>
+    <div class="step-sub">Prueba</div>
+    <p>Ejecuta el comando de diagnóstico (lo vamos a usar mucho a partir de ahora):</p>
+    <pre><code>agent-reach doctor</code></pre>
+    <p>Deberías ver marcas verdes (<code>✅</code>) junto a Web, YouTube, GitHub, RSS y Bilibili (búsqueda y detalle de vídeo).</p>
+    <div class="step-sub">Si no ocurre</div>
+    <p>Si algún canal zero-config aparece en rojo (<code>[X]</code>), <code>agent-reach doctor</code> imprime en ese mismo renglón qué falta y cómo arreglarlo. Sigue esa indicación concreta antes de continuar.</p>
+    <div class="callout info">
+      <span class="ct">Previsualizar sin ejecutar</span>
+      Si prefieres solo previsualizar qué haría <code>--system</code> sin ejecutar nada todavía, puedes usar:
+      <pre style="margin-top:10px"><code>agent-reach install --env=auto --dry-run</code></pre>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ CONFIGURACIÓN -->
+<section class="section" id="configuracion">
+  <div class="sec-head">
+    <div class="sec-icon">🔧</div>
+    <h2>Configurar Agent Reach y primera prueba</h2>
+  </div>
+
+  <p>"Configurar" es distinto de "instalar": instalar pone el programa en tu ordenador; configurar le dice <strong>qué servicios adicionales puede usar</strong> (por ejemplo, tu sesión de Twitter). Ahora mismo, tras el PASO 9, ya tienes activas las siete capacidades que no requieren cuenta. El resto son opcionales y se activan solo si tú lo pides.</p>
+
+  <p>La forma de activar canales opcionales es con la opción <code>--channels</code>, indicando uno o varios de estos nombres: <code>twitter</code>, <code>xiaoyuzhou</code>, <code>xueqiu</code>, <code>xiaohongshu</code>, <code>reddit</code>, <code>facebook</code>, <code>instagram</code>, <code>bilibili</code>, <code>linkedin</code>, <code>opencli</code>, o <code>all</code> para todos.</p>
+
+  <p>Por ejemplo, si más adelante quieres activar Twitter y XiaoHongShu a la vez:</p>
+  <pre><code>agent-reach install --env=auto --system --channels=twitter,xiaohongshu</code></pre>
+
+  <p>No vamos a ejecutar esto todavía. Más adelante iremos activando cada capacidad justo antes de probarla, para que entiendas exactamente qué hace cada paso.</p>
+
+  <h3>Primera prueba</h3>
+  <p>Después de instalar, vamos a conseguir una <strong>victoria real</strong>: no solo "no salió ningún error", sino ver a tu agente de IA leyendo información real de internet.</p>
+
+  <!-- PASO 10 -->
+  <div class="step">
+    <div class="step-head">
+      <span class="step-num">PASO 10</span>
+      <h4>Comprobar el estado general con <code>agent-reach doctor</code></h4>
+    </div>
+    <div class="step-sub">Qué vamos a hacer</div>
+    <p>Pedir un resumen completo del estado de todas las capacidades.</p>
+    <div class="step-sub">Qué estamos probando</div>
+    <p>Que la instalación básica (PASO 9) quedó activa y accesible.</p>
+    <div class="step-sub">Acción</div>
+    <pre><code>agent-reach doctor</code></pre>
+    <div class="step-sub">Qué debería ocurrir</div>
+    <p>Un informe con una leyenda al principio (<code>✅</code> disponible, <code>[!]</code> instalado pero necesita configuración o inicio de sesión, <code>[X]</code> no instalado) y, debajo, cada plataforma con su estado.</p>
+    <div class="step-sub">Cómo saber que funcionó</div>
+    <p>Debes ver <code>✅</code> en, al menos: páginas web, GitHub, YouTube, RSS y Bilibili (búsqueda y detalle).</p>
+    <div class="step-sub">Si no ocurre</div>
+    <p>Repite el PASO 9. Si un canal concreto sigue en rojo, copia el mensaje exacto que te da <code>doctor</code> en esa línea: siempre incluye una sugerencia de arreglo específica para ese canal.</p>
+  </div>
+
+  <!-- PASO 11 -->
+  <div class="step">
+    <div class="step-head">
+      <span class="step-num">PASO 11</span>
+      <h4>Leer tu primera página web de verdad</h4>
+    </div>
+    <div class="step-sub">Qué vamos a hacer</div>
+    <p>Usar la capacidad de lectura web (que no necesita ninguna configuración) para traer el contenido de una página real, limpio y en texto legible.</p>
+    <div class="step-sub">Por qué</div>
+    <p>Esta es la prueba más simple y más útil: confirma que Agent Reach realmente puede traer información de internet a tu agente.</p>
+    <div class="step-sub">Acción</div>
+    <pre><code>curl.exe -s "https://r.jina.ai/https://es.wikipedia.org/wiki/Python"</code></pre>
+    <div class="callout info">
+      <span class="ct">Info</span>
+      Usamos <code>curl.exe</code> (con la extensión explícita) porque PowerShell tiene su propio alias llamado <code>curl</code> que no siempre se comporta igual que el programa real.
+    </div>
+    <div class="step-sub">Qué debería ocurrir</div>
+    <p>Un bloque largo de texto en formato Markdown con el contenido del artículo de Wikipedia sobre Python: títulos, párrafos y enlaces, sin etiquetas HTML.</p>
+    <div class="step-sub">Prueba</div>
+    <p>Comprueba que el texto es legible (frases completas, no símbolos como <code>&lt;div&gt;</code> o <code>&lt;span&gt;</code>) y que menciona "Python" y "lenguaje de programación".</p>
+    <div class="step-sub">Si no ocurre</div>
+    <ul>
+      <li>Si la respuesta está vacía: comprueba tu conexión a internet.</li>
+      <li>Si ves un error de certificado o de red: puede deberse a un firewall corporativo; la documentación oficial consultada no detalla soluciones específicas para ese caso.</li>
+    </ul>
+    <div class="callout example">
+      <span class="ct">Ejemplo</span>
+      <strong>Con esto puedes decir:</strong> "Agent Reach está funcionando." Tu ordenador acaba de traer, limpio y listo para leer, el contenido de una página web real usando exactamente la misma herramienta (Jina Reader) que usará tu agente de IA cada vez que le pidas que lea un enlace.
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ CAPACIDADES I -->
+<section class="section" id="capacidades1">
+  <div class="sec-head">
+    <div class="sec-icon">🧩</div>
+    <h2>Capacidades I — Zero-config (sin cuenta)</h2>
+  </div>
+
+  <p>Vamos a recorrer las <strong>15 capacidades documentadas oficialmente</strong>. Empezamos por las siete que no piden ninguna cuenta ni configuración, y seguimos con las que necesitan que tú apruebes un inicio de sesión o una clave gratuita.</p>
+  <p>Para cada una encontrarás: qué hace, qué necesita, cómo se activa, ejemplos reales (con los comandos exactos que usa el proyecto), qué limitaciones tiene y qué errores son frecuentes.</p>
+
+  <div class="callout info">
+    <span class="ct">Comprobar backend activo</span>
+    Cómo se comprueba qué herramienta está usando cada plataforma ahora mismo:
+    <pre style="margin-top:10px"><code>agent-reach doctor --json</code></pre>
+    Este comando da la misma información que <code>agent-reach doctor</code> pero en un formato que un programa puede leer; el campo <code>active_backend</code> de cada plataforma te dice qué herramienta concreta está usando en este momento.
+  </div>
+
+  <!-- 11.1 -->
+  <div class="cap-card">
+    <div class="cap-head"><span class="ic">🌐</span><h3>11.1 · Páginas web (lectura de cualquier URL)</h3><span class="chip chip-green">Zero-config</span></div>
+    <div class="cap-body">
+      <p><strong>Qué hace:</strong> convierte cualquier página web en texto limpio, en formato Markdown, quitando menús, anuncios y código HTML.</p>
+      <p><strong>Para qué sirve:</strong> para que tu agente pueda "leer" cualquier enlace que le pases, sin atascarse con el diseño de la página.</p>
+      <p><strong>Qué necesita:</strong> nada. Cero configuración.</p>
+      <p><strong>Cómo se configura:</strong> no requiere configuración; queda activo tras el PASO 9.</p>
+      <p><strong>Cómo se usa:</strong></p>
+      <pre><code>curl.exe -s "https://r.jina.ai/URL_COMPLETA"</code></pre>
+
+      <h4>EJEMPLO A — Leer una noticia (ejemplo mínimo)</h4>
+      <p><strong>Objetivo:</strong> obtener el texto de un artículo cualquiera.</p>
+      <p><strong>Preparación:</strong> ninguna.</p>
+      <p><strong>Acción:</strong></p>
+      <pre><code>curl.exe -s "https://r.jina.ai/https://es.wikipedia.org/wiki/Inteligencia_artificial"</code></pre>
+      <p><strong>Resultado esperado:</strong> texto en Markdown con el contenido del artículo.</p>
+      <p><strong>Qué acaba de suceder:</strong> Agent Reach envió la URL a Jina Reader, un servicio que descarga la página, la limpia y devuelve solo el contenido legible.</p>
+
+      <h4>EJEMPLO B — Comparar dos páginas (ejemplo práctico)</h4>
+      <p><strong>Objetivo:</strong> traer el contenido de dos páginas para que tu agente las compare.</p>
+      <p><strong>Preparación:</strong> ten a mano dos URLs sobre el mismo tema.</p>
+      <p><strong>Acción:</strong></p>
+      <pre><code>curl.exe -s "https://r.jina.ai/https://es.wikipedia.org/wiki/Python"
+curl.exe -s "https://r.jina.ai/https://es.wikipedia.org/wiki/JavaScript"</code></pre>
+      <p><strong>Resultado esperado:</strong> dos bloques de texto, uno por página.</p>
+      <p><strong>Qué acaba de suceder:</strong> ejecutaste la misma capacidad dos veces con URLs distintas; así es como tu agente reuniría información de varias fuentes antes de responderte.</p>
+      <p><strong>Variación:</strong> prueba con una página en otro idioma; Jina Reader conserva el idioma original del texto.</p>
+      <p><strong>Limitaciones:</strong> la documentación oficial consultada no especifica límites de tamaño de página ni de peticiones por minuto para este servicio.</p>
+      <p><strong>Errores frecuentes:</strong> si la página exige haber iniciado sesión (por ejemplo contenido detrás de un muro de pago), el texto devuelto puede estar incompleto o vacío; esto no es un fallo de Agent Reach, sino una limitación de la propia página.</p>
+    </div>
+  </div>
+
+  <!-- 11.2 -->
+  <div class="cap-card">
+    <div class="cap-head"><span class="ic">📡</span><h3>11.2 · RSS (cualquier fuente RSS/Atom)</h3><span class="chip chip-green">Zero-config</span></div>
+    <div class="cap-body">
+      <p><strong>Qué hace:</strong> lee fuentes RSS o Atom (las que usan blogs, medios de noticias y podcasts para publicar sus actualizaciones).</p>
+      <p><strong>Para qué sirve:</strong> para que tu agente pueda revisar si un blog o medio tiene contenido nuevo, sin que tengas que visitarlo tú.</p>
+      <p><strong>Qué necesita:</strong> nada. Cero configuración.</p>
+      <p><strong>Cómo se usa:</strong> Agent Reach usa la librería de Python <code>feedparser</code>:</p>
+      <pre><code>python3 -c "
+import feedparser
+for e in feedparser.parse('URL_DEL_FEED').entries[:5]:
+    print(f'{e.title} - {e.link}')
+"</code></pre>
+      <div class="callout info">
+        <span class="ct">Info</span>
+        En Windows, si <code>python3</code> no funciona pero <code>python</code> sí, usa <code>python</code> en su lugar.
+      </div>
+
+      <h4>EJEMPLO A — Leer los últimos titulares de un feed (ejemplo mínimo)</h4>
+      <p><strong>Objetivo:</strong> ver los 5 títulos más recientes de una fuente RSS pública.</p>
+      <p><strong>Preparación:</strong> ninguna.</p>
+      <p><strong>Acción:</strong></p>
+      <pre><code>python -c "
+import feedparser
+for e in feedparser.parse('https://blog.python.org/feeds/posts/default').entries[:5]:
+    print(f'{e.title} - {e.link}')
+"</code></pre>
+      <p><strong>Resultado esperado:</strong> cinco líneas, cada una con un título y un enlace.</p>
+      <p><strong>Qué acaba de suceder:</strong> <code>feedparser</code> descargó el feed, lo interpretó y extrajo los cinco elementos más recientes.</p>
+
+      <h4>EJEMPLO B — Vigilar varias fuentes a la vez (ejemplo práctico)</h4>
+      <p><strong>Objetivo:</strong> revisar dos fuentes distintas en una sola pasada.</p>
+      <p><strong>Preparación:</strong> ten a mano las URLs de dos feeds.</p>
+      <p><strong>Acción:</strong></p>
+      <pre><code>python -c "
+import feedparser
+feeds = ['https://blog.python.org/feeds/posts/default', 'https://hnrss.org/frontpage']
+for url in feeds:
+    print('---', url, '---')
+    for e in feedparser.parse(url).entries[:3]:
+        print(f'{e.title} - {e.link}')
+"</code></pre>
+      <p><strong>Resultado esperado:</strong> dos bloques, uno por fuente, con tres titulares cada uno.</p>
+      <p><strong>Qué acaba de suceder:</strong> recorriste una lista de feeds en un solo script; así es como tu agente podría vigilar varias fuentes a la vez cuando le pidas "avísame si hay novedades en estos blogs".</p>
+      <p><strong>Variación:</strong> cambia <code>[:3]</code> por <code>[:10]</code> para ver más elementos de cada fuente.</p>
+      <p><strong>Limitaciones:</strong> solo funciona con fuentes que publiquen realmente un feed RSS/Atom válido; no todas las webs lo ofrecen.</p>
+      <p><strong>Errores frecuentes:</strong> si la URL no es un feed válido, <code>feedparser</code> puede devolver una lista vacía en vez de un error explícito; conviene comprobar visualmente que la URL termina en algo como <code>/feed</code>, <code>/rss</code> o <code>.xml</code>.</p>
+    </div>
+  </div>
+
+  <!-- 11.3 -->
+  <div class="cap-card">
+    <div class="cap-head"><span class="ic">📦</span><h3>11.3 · GitHub</h3><span class="chip chip-green">Zero-config (públicos)</span></div>
+    <div class="cap-body">
+      <p><strong>Qué hace:</strong> lee y busca en repositorios públicos de GitHub (código, Issues, Pull Requests, Releases) usando la herramienta oficial <code>gh</code>.</p>
+      <p><strong>Para qué sirve:</strong> para que tu agente pueda responder "¿de qué trata este repositorio?" o "¿qué dice este Issue?" sin que tengas que copiar y pegar tú el contenido.</p>
+      <p><strong>Qué necesita:</strong> el propio <code>gh</code> CLI, que instalamos en el PASO 6. Los repositorios <strong>públicos</strong> funcionan sin iniciar sesión. Para repositorios privados, o para hacer Fork/crear Issues/PRs, hace falta iniciar sesión.</p>
+      <p><strong>Cómo se configura (opcional, solo si necesitas repos privados):</strong></p>
+      <pre><code>gh auth login</code></pre>
+      <p>Sigue las instrucciones en pantalla (te pedirá abrir una página web y pegar un código).</p>
+      <p><strong>Cómo se usa:</strong></p>
+      <pre><code>gh repo view owner/repositorio
+gh search repos "consulta" --sort stars --limit 10
+gh issue list -R owner/repositorio --state open</code></pre>
+
+      <h4>EJEMPLO A — Ver de qué trata un repositorio (ejemplo mínimo)</h4>
+      <p><strong>Objetivo:</strong> obtener la descripción y estadísticas básicas de un repositorio público.</p>
+      <p><strong>Preparación:</strong> ninguna.</p>
+      <p><strong>Acción:</strong></p>
+      <pre><code>gh repo view python/cpython</code></pre>
+      <p><strong>Resultado esperado:</strong> nombre, descripción, número de estrellas y enlace del repositorio oficial de Python.</p>
+      <p><strong>Qué acaba de suceder:</strong> <code>gh</code> consultó la API de GitHub y te devolvió la información pública del repositorio.</p>
+
+      <h4>EJEMPLO B — Buscar repositorios y revisar sus Issues abiertos (ejemplo práctico)</h4>
+      <p><strong>Objetivo:</strong> encontrar repositorios populares sobre un tema y revisar qué problemas tienen abiertos.</p>
+      <p><strong>Preparación:</strong> ninguna.</p>
+      <p><strong>Acción:</strong></p>
+      <pre><code>gh search repos "agente de IA" --sort stars --limit 5
+gh issue list -R Panniantong/Agent-Reach --state open</code></pre>
+      <p><strong>Resultado esperado:</strong> una lista de repositorios ordenados por popularidad, seguida de una lista de Issues abiertos del propio Agent Reach.</p>
+      <p><strong>Qué acaba de suceder:</strong> primero buscaste en todo GitHub, después consultaste el estado interno de un repositorio concreto.</p>
+      <p><strong>Variación:</strong> cambia <code>--state open</code> por <code>--state closed</code> para ver Issues ya resueltos.</p>
+      <p><strong>Limitaciones:</strong> sin <code>gh auth login</code>, no puedes hacer Fork, crear Issues/PRs ni acceder a repositorios privados.</p>
+      <p><strong>Errores frecuentes:</strong> si <code>gh</code> responde con un error de límite de peticiones (rate limit), es porque estás haciendo muchas consultas sin haber iniciado sesión; <code>gh auth login</code> sube ese límite considerablemente.</p>
+    </div>
+  </div>
+
+  <!-- 11.4 -->
+  <div class="cap-card">
+    <div class="cap-head"><span class="ic">📺</span><h3>11.4 · YouTube</h3><span class="chip chip-green">Zero-config</span></div>
+    <div class="cap-body">
+      <p><strong>Qué hace:</strong> extrae los subtítulos de un vídeo de YouTube y permite buscar vídeos, usando la herramienta <code>yt-dlp</code>.</p>
+      <p><strong>Para qué sirve:</strong> para que tu agente pueda resumir o analizar el contenido hablado de un vídeo sin que tú tengas que verlo entero.</p>
+      <p><strong>Qué necesita:</strong> nada adicional; <code>yt-dlp</code> se instala junto con Agent Reach.</p>
+      <p><strong>Cómo se usa:</strong></p>
+      <pre><code>yt-dlp --dump-json "URL_DEL_VIDEO"
+yt-dlp --write-sub --write-auto-sub --sub-lang "es,en" --skip-download -o "video" "URL_DEL_VIDEO"</code></pre>
+
+      <h4>EJEMPLO A — Extraer los subtítulos de un vídeo (ejemplo mínimo)</h4>
+      <p><strong>Objetivo:</strong> descargar el archivo de subtítulos de un vídeo público.</p>
+      <p><strong>Preparación:</strong> ten a mano la URL de un vídeo de YouTube con subtítulos.</p>
+      <p><strong>Acción:</strong></p>
+      <pre><code>yt-dlp --write-sub --write-auto-sub --sub-lang "es,en" --skip-download -o "video" "URL_DEL_VIDEO"</code></pre>
+      <p>Después, para leer el archivo generado (el nombre exacto depende del vídeo, pero termina en <code>.vtt</code>):</p>
+      <pre><code>Get-Content video.*.vtt</code></pre>
+      <p><strong>Resultado esperado:</strong> un archivo de texto con el guion del vídeo, con marcas de tiempo.</p>
+      <p><strong>Qué acaba de suceder:</strong> <code>yt-dlp</code> descargó únicamente el archivo de subtítulos (no el vídeo) y lo guardó en tu carpeta actual.</p>
+
+      <h4>EJEMPLO B — Buscar vídeos sobre un tema (ejemplo práctico)</h4>
+      <p><strong>Objetivo:</strong> encontrar vídeos sobre un tema sin abrir YouTube manualmente.</p>
+      <p><strong>Preparación:</strong> ninguna.</p>
+      <p><strong>Acción:</strong></p>
+      <pre><code>yt-dlp --dump-json "ytsearch5:tutorial de Python para principiantes"</code></pre>
+      <p><strong>Resultado esperado:</strong> cinco bloques de datos en formato JSON, cada uno con el título, canal y URL de un vídeo.</p>
+      <p><strong>Qué acaba de suceder:</strong> <code>yt-dlp</code> buscó en YouTube y te devolvió información estructurada de los cinco primeros resultados, sin necesidad de abrir un navegador.</p>
+      <p><strong>Variación:</strong> cambia el número <code>5</code> por otra cantidad para obtener más o menos resultados.</p>
+      <p><strong>Limitaciones:</strong> los subtítulos generados automáticamente por YouTube (no escritos por una persona) pueden tener líneas repetidas. Si un vídeo no tiene subtítulos, esta capacidad no puede extraer texto: en ese caso hace falta transcripción por audio, que Agent Reach no ofrece para YouTube directamente en la versión documentada (sí existe para podcasts de Xiaoyuzhou).</p>
+      <p><strong>Errores frecuentes:</strong> si YouTube exige una verificación anti-robot, la extracción de subtítulos puede fallar o devolver una respuesta vacía; suele resolverse reintentando pasado un momento.</p>
+    </div>
+  </div>
+
+  <!-- 11.5 -->
+  <div class="cap-card">
+    <div class="cap-head"><span class="ic">📺</span><h3>11.5 · Bilibili</h3><span class="chip chip-green">Búsqueda y detalle zero-config</span><span class="chip chip-amber">Subtítulos: OpenCLI</span></div>
+    <div class="cap-body">
+      <p><strong>Qué hace:</strong> busca vídeos, consulta detalles y (con Chrome) extrae subtítulos de Bilibili, la plataforma de vídeo china.</p>
+      <p><strong>Para qué sirve:</strong> para acceder a contenido de Bilibili, algo que herramientas genéricas no consiguen porque la plataforma bloquea activamente el acceso automatizado.</p>
+      <p><strong>Qué necesita:</strong> para búsqueda y detalle de vídeo, nada (<code>bili-cli</code>, instalado en el PASO 9). Para subtítulos, hace falta <code>OpenCLI</code>.</p>
+      <p><strong>Cómo se configura:</strong> la búsqueda y el detalle ya están activos tras el PASO 9. Los subtítulos requieren <code>OpenCLI</code>:</p>
+      <pre><code>agent-reach install --system --channels opencli</code></pre>
+      <p>Después, instala la extensión de Chrome desde <a href="https://chromewebstore.google.com/detail/opencli/ildkmabpimmkaediidaifkhjpohdnifk" target="_blank" rel="noopener">https://chromewebstore.google.com/detail/opencli/ildkmabpimmkaediidaifkhjpohdnifk</a> y comprueba con <code>opencli doctor</code>.</p>
+      <p><strong>Cómo se usa:</strong></p>
+      <pre><code>bili search "consulta" --type video -n 5
+bili video BVxxxxxxxxx
+bili hot -n 10
+opencli bilibili subtitle BVxxxxxxxxx</code></pre>
+
+      <h4>EJEMPLO A — Buscar vídeos (ejemplo mínimo)</h4>
+      <p><strong>Objetivo:</strong> encontrar vídeos sobre un tema en Bilibili.</p>
+      <p><strong>Preparación:</strong> ninguna.</p>
+      <p><strong>Acción:</strong></p>
+      <pre><code>bili search "inteligencia artificial" --type video -n 5</code></pre>
+      <p><strong>Resultado esperado:</strong> una lista de cinco vídeos con título, autor y su identificador <code>BV</code>.</p>
+      <p><strong>Qué acaba de suceder:</strong> <code>bili-cli</code> consultó la API pública de búsqueda de Bilibili sin necesidad de iniciar sesión.</p>
+
+      <h4>EJEMPLO B — Ver el detalle de un vídeo y sus subtítulos (ejemplo práctico)</h4>
+      <p><strong>Objetivo:</strong> obtener toda la información de un vídeo concreto, incluidos sus subtítulos.</p>
+      <p><strong>Preparación:</strong> haber activado <code>OpenCLI</code> como se explica arriba, y tener Chrome abierto.</p>
+      <p><strong>Acción:</strong></p>
+      <pre><code>bili video BVxxxxxxxxx
+opencli bilibili subtitle BVxxxxxxxxx</code></pre>
+      <p>(sustituye <code>BVxxxxxxxxx</code> por el identificador real, visible en la URL del vídeo)</p>
+      <p><strong>Resultado esperado:</strong> primero, título, autor, duración y datos de interacción del vídeo; después, el subtítulo completo con marcas de tiempo.</p>
+      <p><strong>Qué acaba de suceder:</strong> combinaste dos herramientas distintas: <code>bili-cli</code> para los metadatos (sin login) y <code>OpenCLI</code> para el subtítulo (que sí necesita tu sesión de navegador).</p>
+      <p><strong>Variación:</strong> prueba <code>bili rank -n 10</code> para ver el ranking de vídeos más populares en vez de una búsqueda.</p>
+      <p><strong>Limitaciones:</strong> la documentación oficial es explícita en advertir que <strong>no se debe usar <code>yt-dlp</code> para Bilibili</strong>: Bilibili bloquea esa herramienta concreta con un error HTTP 412, comprobado en pruebas reales por el propio proyecto.</p>
+      <p><strong>Errores frecuentes:</strong> si <code>opencli bilibili subtitle</code> falla, comprueba que Chrome está abierto y que la extensión de OpenCLI aparece como conectada (<code>opencli doctor</code>).</p>
+    </div>
+  </div>
+
+  <!-- 11.6 -->
+  <div class="cap-card">
+    <div class="cap-head"><span class="ic">💻</span><h3>11.6 · V2EX</h3><span class="chip chip-green">Zero-config</span></div>
+    <div class="cap-body">
+      <p><strong>Qué hace:</strong> lee los temas más populares, temas por categoría ("nodo"), el detalle de un tema con sus respuestas, y perfiles de usuario de V2EX, una comunidad tecnológica.</p>
+      <p><strong>Para qué sirve:</strong> para consultar discusiones técnicas de esa comunidad sin visitarla manualmente.</p>
+      <p><strong>Qué necesita:</strong> nada. Cero configuración, API pública.</p>
+      <p><strong>Cómo se usa:</strong></p>
+      <pre><code>curl.exe -s "https://www.v2ex.com/api/topics/hot.json" -H "User-Agent: agent-reach/1.0"
+curl.exe -s "https://www.v2ex.com/api/topics/show.json?node_name=python&page=1" -H "User-Agent: agent-reach/1.0"</code></pre>
+
+      <h4>EJEMPLO A — Ver los temas más populares (ejemplo mínimo)</h4>
+      <p><strong>Objetivo:</strong> obtener los temas destacados del momento.</p>
+      <p><strong>Preparación:</strong> ninguna.</p>
+      <p><strong>Acción:</strong></p>
+      <pre><code>curl.exe -s "https://www.v2ex.com/api/topics/hot.json" -H "User-Agent: agent-reach/1.0"</code></pre>
+      <p><strong>Resultado esperado:</strong> una lista en formato JSON con los temas más comentados actualmente.</p>
+      <p><strong>Qué acaba de suceder:</strong> consultaste directamente la API pública de V2EX, sin pasar por ninguna herramienta adicional.</p>
+
+      <h4>EJEMPLO B — Leer un tema concreto con sus respuestas (ejemplo práctico)</h4>
+      <p><strong>Objetivo:</strong> obtener el contenido completo de un tema y sus comentarios.</p>
+      <p><strong>Preparación:</strong> obtén el número de un tema desde su URL, por ejemplo <code>https://www.v2ex.com/t/1234567</code> → el identificador es <code>1234567</code>.</p>
+      <p><strong>Acción:</strong></p>
+      <pre><code>curl.exe -s "https://www.v2ex.com/api/topics/show.json?id=1234567" -H "User-Agent: agent-reach/1.0"
+curl.exe -s "https://www.v2ex.com/api/replies/show.json?topic_id=1234567&page=1" -H "User-Agent: agent-reach/1.0"</code></pre>
+      <p><strong>Resultado esperado:</strong> primero el contenido del tema, después la lista de respuestas.</p>
+      <p><strong>Qué acaba de suceder:</strong> hiciste dos consultas separadas: una para el tema, otra para sus respuestas, porque la API de V2EX las separa en dos endpoints distintos.</p>
+      <p><strong>Variación:</strong> cambia <code>node_name=python</code> por otro nombre de categoría (por ejemplo <code>tech</code>, <code>jobs</code>, <code>qna</code>) para explorar otro tema.</p>
+      <p><strong>Limitaciones:</strong> la documentación oficial consultada no especifica límites de peticiones por minuto para esta API pública.</p>
+      <p><strong>Errores frecuentes:</strong> si omites la cabecera <code>User-Agent</code>, algunas peticiones pueden ser rechazadas por el servidor.</p>
+    </div>
+  </div>
+
+  <!-- 11.7 -->
+  <div class="cap-card">
+    <div class="cap-head"><span class="ic">🔍</span><h3>11.7 · Búsqueda web (Exa)</h3><span class="chip chip-green">Zero-config</span></div>
+    <div class="cap-body">
+      <p><strong>Qué hace:</strong> realiza búsquedas semánticas en toda la web (no solo por palabras clave exactas, sino por significado), especialmente buena para documentación técnica y ejemplos de código.</p>
+      <p><strong>Para qué sirve:</strong> cuando tu agente necesita investigar algo en internet de forma general, más allá de una plataforma concreta.</p>
+      <p><strong>Qué necesita:</strong> nada que tú tengas que gestionar: se activa automáticamente durante la instalación (PASO 9) mediante MCP (<em>Model Context Protocol</em>), sin necesidad de clave de API.</p>
+      <p><strong>Cómo se usa:</strong></p>
+      <pre><code>mcporter call exa.web_search_exa query="consulta" numResults=5</code></pre>
+
+      <h4>EJEMPLO A — Buscar información sobre un tema técnico (ejemplo mínimo)</h4>
+      <p><strong>Objetivo:</strong> encontrar páginas relevantes sobre un tema.</p>
+      <p><strong>Preparación:</strong> ninguna, más allá de tener Exa activo.</p>
+      <p><strong>Acción:</strong></p>
+      <pre><code>mcporter call exa.web_search_exa query="cómo funciona la memoria de un agente de IA" numResults=5</code></pre>
+      <p><strong>Resultado esperado:</strong> una lista de cinco resultados con título, URL y un fragmento de contenido de cada página.</p>
+      <p><strong>Qué acaba de suceder:</strong> Exa interpretó el significado de tu consulta (no solo las palabras exactas) y devolvió páginas relevantes.</p>
+
+      <h4>EJEMPLO B — Buscar documentación de una librería concreta (ejemplo práctico)</h4>
+      <p><strong>Objetivo:</strong> encontrar ejemplos de código oficiales de una librería.</p>
+      <p><strong>Preparación:</strong> ninguna.</p>
+      <p><strong>Acción:</strong></p>
+      <pre><code>mcporter call exa.web_search_exa query="feedparser Python ejemplo de uso" numResults=5</code></pre>
+      <p><strong>Resultado esperado:</strong> resultados apuntando a documentación oficial y ejemplos de código de la librería <code>feedparser</code>.</p>
+      <p><strong>Qué acaba de suceder:</strong> usaste la misma capacidad, pero orientada a búsqueda técnica; la documentación del proyecto señala que Exa es especialmente bueno para contenido técnico en inglés.</p>
+      <p><strong>Variación:</strong> cambia <code>numResults=5</code> por un número mayor para obtener más resultados.</p>
+      <p><strong>Limitaciones:</strong> la documentación oficial consultada no especifica una cuota mensual gratuita concreta para este acceso vía MCP; solo confirma que es gratuito y no requiere clave.</p>
+      <p><strong>Errores frecuentes:</strong> si el comando falla con un error de conexión MCP, revisa que Node.js (PASO 5) esté correctamente instalado, ya que <code>mcporter</code> depende de él.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ CAPACIDADES II -->
+<section class="section" id="capacidades2">
+  <div class="sec-head">
+    <div class="sec-icon">🔐</div>
+    <h2>Capacidades II — Requieren sesión o clave</h2>
+  </div>
+
+  <p>Estas capacidades necesitan que tú apruebes un inicio de sesión, exportes una cookie o configures una clave gratuita. Cada una se activa individualmente.</p>
+
+  <!-- 11.8 -->
+  <div class="cap-card">
+    <div class="cap-head"><span class="ic">🐦</span><h3>11.8 · Twitter / X</h3><span class="chip chip-amber">Requiere cookie</span></div>
+    <div class="cap-body">
+      <p><strong>Qué hace:</strong> lee la línea de tiempo, tuits individuales, artículos largos y perfiles de usuario; permite buscar tuits (aunque la búsqueda puede fallar a veces por cambios frecuentes de Twitter/X).</p>
+      <p><strong>Para qué sirve:</strong> para que tu agente pueda consultar conversaciones o noticias que están sucediendo en Twitter/X.</p>
+      <p><strong>Qué necesita:</strong> una cookie de sesión de tu propia cuenta de Twitter/X, exportada manualmente desde tu navegador. <strong>Recomendación explícita del proyecto: usa una cuenta secundaria, no tu cuenta principal</strong>, porque el uso automatizado por cookie puede hacer que la plataforma detecte actividad no habitual y limite la cuenta.</p>
+
+      <h4>Cómo se configura</h4>
+      <ol>
+        <li>Instala la extensión de Chrome <strong>Cookie-Editor</strong>: <a href="https://chromewebstore.google.com/detail/cookie-editor/hlkenndednhfkekhgcdicdfddnkalmdm" target="_blank" rel="noopener">https://chromewebstore.google.com/detail/cookie-editor/hlkenndednhfkekhgcdicdfddnkalmdm</a></li>
+        <li>Ve a <code>https://x.com</code> y comprueba que has iniciado sesión.</li>
+        <li>Haz clic en el icono de Cookie-Editor → <strong>Export</strong> → <strong>Header String</strong>.</li>
+        <li>Pega el resultado cuando tu agente te lo pida, o ejecútalo tú directamente:</li>
+      </ol>
+      <pre><code>agent-reach configure twitter-cookies</code></pre>
+      <p>Este comando guarda el valor <strong>solo para que <code>agent-reach doctor</code> pueda comprobar que existe</strong>. Para usar Twitter de verdad hace falta, además, definir dos variables de entorno en la misma ventana de PowerShell donde vayas a ejecutar los comandos:</p>
+      <pre><code>$env:TWITTER_AUTH_TOKEN = "tu_valor_aqui"
+$env:TWITTER_CT0 = "tu_valor_aqui"</code></pre>
+      <div class="callout info">
+        <span class="ct">Info</span>
+        Estos dos valores (<code>auth_token</code> y <code>ct0</code>) están incluidos dentro del texto largo que copiaste con Cookie-Editor.
+      </div>
+
+      <p><strong>Cómo se usa:</strong></p>
+      <pre><code>twitter feed -n 20
+twitter tweet URL_O_ID
+twitter user-posts @usuario -n 20
+twitter search "consulta" -n 10</code></pre>
+
+      <h4>EJEMPLO A — Leer un tuit concreto (ejemplo mínimo)</h4>
+      <p><strong>Objetivo:</strong> obtener el contenido y las respuestas de un tuit.</p>
+      <p><strong>Preparación:</strong> haber configurado las variables de entorno de arriba en esta misma ventana de PowerShell.</p>
+      <p><strong>Acción:</strong></p>
+      <pre><code>twitter tweet URL_DEL_TUIT</code></pre>
+      <p><strong>Resultado esperado:</strong> el texto del tuit, autor, fecha, y sus respuestas más relevantes.</p>
+      <p><strong>Qué acaba de suceder:</strong> <code>twitter-cli</code> usó tus credenciales de sesión para leer ese contenido exactamente como lo verías tú en el navegador.</p>
+
+      <h4>EJEMPLO B — Revisar la actividad reciente de una cuenta (ejemplo práctico)</h4>
+      <p><strong>Objetivo:</strong> ver los últimos tuits publicados por una cuenta concreta.</p>
+      <p><strong>Preparación:</strong> igual que en el ejemplo A.</p>
+      <p><strong>Acción:</strong></p>
+      <pre><code>twitter user-posts @usuario -n 20</code></pre>
+      <p><strong>Resultado esperado:</strong> los 20 tuits más recientes de esa cuenta.</p>
+      <p><strong>Qué acaba de suceder:</strong> consultaste la línea de tiempo pública de un usuario concreto, en vez de un único tuit.</p>
+      <p><strong>Variación:</strong> prueba <code>twitter feed -n 20</code> para ver tu propia línea de tiempo en vez de la de otra cuenta.</p>
+      <p><strong>Limitaciones:</strong> la documentación del proyecto marca explícitamente <code>twitter search</code> y <code>twitter likes</code> como comandos que <strong>pueden fallar</strong> porque Twitter/X cambia con frecuencia su funcionamiento interno; <code>likes</code> además solo funciona sobre tu propia cuenta desde 2024, por restricción de la plataforma.</p>
+      <p><strong>Errores frecuentes:</strong> si <code>search</code> falla, el propio proyecto documenta esta cadena de alternativas, en este orden:</p>
+      <ol>
+        <li>reintentar una vez;</li>
+        <li>actualizar la herramienta (<code>pipx upgrade twitter-cli</code>) y reintentar;</li>
+        <li>si tienes <code>OpenCLI</code> activo, usar <code>opencli twitter search "consulta" -f yaml</code> en su lugar;</li>
+        <li>si nada funciona, usar comandos más estables como <code>twitter feed</code> o <code>twitter user-posts</code>.</li>
+      </ol>
+    </div>
+  </div>
+
+  <!-- 11.9 -->
+  <div class="cap-card">
+    <div class="cap-head"><span class="ic">📖</span><h3>11.9 · Reddit</h3><span class="chip chip-red">Requiere sesión</span></div>
+    <div class="cap-body">
+      <p><strong>Qué hace:</strong> busca y lee publicaciones y comentarios de Reddit, incluyendo subreddits concretos y los temas más populares.</p>
+      <p><strong>Para qué sirve:</strong> para consultar debates, opiniones o soluciones a problemas técnicos que la gente comparte en Reddit.</p>
+      <p><strong>Qué necesita:</strong> una sesión iniciada. La documentación oficial es clara en un punto importante: <strong>Reddit no tiene ninguna vía sin configuración</strong>. El acceso anónimo está bloqueado por la plataforma, y la API oficial requiere una aprobación manual que rara vez se concede a proyectos personales.</p>
+
+      <h4>Cómo se configura — opción de escritorio, recomendada (<code>OpenCLI</code>)</h4>
+      <pre><code>agent-reach install --system --channels opencli</code></pre>
+      <p>Instala la extensión de Chrome, verifica con <code>opencli doctor</code>, e inicia sesión normalmente en <code>reddit.com</code> desde ese mismo Chrome. <code>OpenCLI</code> reutiliza esa sesión sin necesidad de exportar ninguna cookie manualmente.</p>
+
+      <h4>Cómo se configura — alternativa para servidores sin escritorio (<code>rdt-cli</code>)</h4>
+      <p>Esta vía sí necesita Git, porque se instala directamente desde el código fuente en GitHub:</p>
+      <pre><code>pipx install "git+https://github.com/public-clis/rdt-cli.git@5e4fb3720d5c174e976cd425ccc3b879d52cac66"
+rdt login</code></pre>
+      <div class="callout warn">
+        <span class="ct">Advertencia</span>
+        Si no tienes Git instalado y quieres usar esta vía: descárgalo desde <a href="https://git-scm.com/download/win" target="_blank" rel="noopener">https://git-scm.com/download/win</a> e instálalo con las opciones por defecto.
+      </div>
+
+      <p><strong>Cómo se usa (con <code>OpenCLI</code>):</strong></p>
+      <pre><code>opencli reddit search "consulta" -f yaml
+opencli reddit read ID_DEL_POST -f yaml
+opencli reddit subreddit LocalLLaMA -f yaml
+opencli reddit hot -f yaml</code></pre>
+      <p><strong>Cómo se usa (con <code>rdt-cli</code>):</strong></p>
+      <pre><code>rdt search "consulta" --limit 10
+rdt read ID_DEL_POST
+rdt sub python --limit 20</code></pre>
+
+      <h4>EJEMPLO A — Buscar publicaciones sobre un tema (ejemplo mínimo)</h4>
+      <p><strong>Objetivo:</strong> encontrar publicaciones relevantes sobre un tema.</p>
+      <p><strong>Preparación:</strong> haber iniciado sesión en Reddit dentro de Chrome, con <code>OpenCLI</code> activo.</p>
+      <p><strong>Acción:</strong></p>
+      <pre><code>opencli reddit search "modelos de lenguaje locales" -f yaml</code></pre>
+      <p><strong>Resultado esperado:</strong> una lista de publicaciones con título, subreddit y puntuación.</p>
+      <p><strong>Qué acaba de suceder:</strong> <code>OpenCLI</code> usó tu sesión de navegador para hacer la búsqueda como si la hicieras tú mismo.</p>
+
+      <h4>EJEMPLO B — Leer un hilo completo con comentarios (ejemplo práctico)</h4>
+      <p><strong>Objetivo:</strong> obtener el texto completo de una publicación y sus comentarios.</p>
+      <p><strong>Preparación:</strong> igual que en el ejemplo A. Necesitas el identificador de la publicación (visible en su URL).</p>
+      <p><strong>Acción:</strong></p>
+      <pre><code>opencli reddit read ID_DEL_POST -f yaml</code></pre>
+      <p><strong>Resultado esperado:</strong> el texto completo de la publicación seguido de sus comentarios, con la puntuación de cada uno.</p>
+      <p><strong>Qué acaba de suceder:</strong> consultaste el hilo completo, no solo el resumen que aparece en los resultados de búsqueda.</p>
+      <p><strong>Variación:</strong> prueba <code>opencli reddit subreddit LocalLLaMA -f yaml</code> para explorar un subreddit concreto en vez de buscar por palabra.</p>
+      <p><strong>Limitaciones:</strong> sin sesión iniciada, esta capacidad simplemente no funciona; no existe ningún modo gratuito sin cuenta.</p>
+      <p><strong>Errores frecuentes:</strong> si accedes desde fuera de tu país habitual, o desde un servidor, puede que Reddit te pida un proxy; la documentación recomienda un proxy residencial (por ejemplo, <a href="https://webshare.io" target="_blank" rel="noopener">https://webshare.io</a>, alrededor de 1 $/mes) solo en esos casos.</p>
+    </div>
+  </div>
+
+  <!-- 11.10 -->
+  <div class="cap-card">
+    <div class="cap-head"><span class="ic">📕</span><h3>11.10 · XiaoHongShu (小红书)</h3><span class="chip chip-amber">Tres vías de acceso</span></div>
+    <div class="cap-body">
+      <p><strong>Qué hace:</strong> busca notas, lee su contenido completo, comentarios y el perfil de un usuario en XiaoHongShu (una red social china centrada en reseñas y estilo de vida).</p>
+      <p><strong>Para qué sirve:</strong> para consultar opiniones y reseñas publicadas en esa plataforma.</p>
+      <p><strong>Qué necesita:</strong> hay <strong>tres formas distintas</strong> de acceder, y Agent Reach elige automáticamente la mejor disponible. Antes de usar cualquiera, comprueba cuál está activa:</p>
+      <pre><code>agent-reach doctor --json</code></pre>
+
+      <h4>Vía A — <code>OpenCLI</code> (recomendada en escritorio)</h4>
+      <p>Reutiliza una sesión de Chrome que <strong>tú ya tengas abierta</strong> en xiaohongshu.com. Agent Reach nunca inicia sesión por ti ni lee cookies del navegador directamente; solo usa la sesión que tú ya controlas.</p>
+      <pre><code>agent-reach install --system --channels opencli</code></pre>
+      <p>Instala la extensión de Chrome e inicia sesión tú mismo en xiaohongshu.com.</p>
+
+      <h4>Vía B — para servidores sin escritorio, con exportación manual de cookie</h4>
+      <pre><code>agent-reach configure xhs-cookies</code></pre>
+      <p>(usa el mismo procedimiento de Cookie-Editor que para Twitter, explicado en la sección 11.8)</p>
+
+      <p><strong>Cómo se usa (vía A, <code>OpenCLI</code>):</strong></p>
+      <pre><code>opencli xiaohongshu search "consulta" -f yaml
+opencli xiaohongshu note "URL_COMPLETA_DE_LA_NOTA" -f yaml
+opencli xiaohongshu comments ID_DE_NOTA -f yaml</code></pre>
+
+      <h4>EJEMPLO A — Buscar notas sobre un tema (ejemplo mínimo)</h4>
+      <p><strong>Objetivo:</strong> encontrar publicaciones sobre un producto o tema.</p>
+      <p><strong>Preparación:</strong> sesión iniciada en xiaohongshu.com dentro de Chrome, con <code>OpenCLI</code> activo.</p>
+      <p><strong>Acción:</strong></p>
+      <pre><code>opencli xiaohongshu search "cámaras para principiantes" -f yaml</code></pre>
+      <p><strong>Resultado esperado:</strong> una lista de notas con título, autor y estadísticas de interacción.</p>
+      <p><strong>Qué acaba de suceder:</strong> <code>OpenCLI</code> realizó la búsqueda usando tu propia sesión de navegador.</p>
+
+      <h4>EJEMPLO B — Leer una nota completa con sus comentarios (ejemplo práctico)</h4>
+      <p><strong>Objetivo:</strong> obtener el contenido completo de una publicación concreta.</p>
+      <p><strong>Preparación:</strong> igual que el ejemplo A. <strong>Importante:</strong> usa la URL completa tal cual aparece en los resultados de búsqueda (incluye un parámetro especial llamado <code>xsec_token</code>); no funciona con un identificador suelto.</p>
+      <p><strong>Acción:</strong></p>
+      <pre><code>opencli xiaohongshu note "URL_COMPLETA_DE_LA_NOTA" -f yaml</code></pre>
+      <p><strong>Resultado esperado:</strong> el texto completo de la nota, imágenes referenciadas y estadísticas.</p>
+      <p><strong>Qué acaba de suceder:</strong> leíste el contenido completo de una publicación concreta, no solo su resumen en la búsqueda.</p>
+      <p><strong>Variación:</strong> añade <code>opencli xiaohongshu comments ID_DE_NOTA -f yaml</code> para ver también los comentarios.</p>
+      <p><strong>Limitaciones:</strong> la documentación es explícita en que <strong>no se debe leer una nota usando solo su identificador suelto</strong>: siempre hace falta la URL completa obtenida de un resultado de búsqueda o del feed, porque XiaoHongShu exige ese token de seguridad. Las operaciones de escritura (publicar, comentar, dar "me gusta") no se recomiendan porque pueden fallar por problemas de firma digital.</p>
+      <p><strong>Errores frecuentes:</strong> hacer muchas búsquedas seguidas o revisar comentarios en profundidad puede activar un captcha de la plataforma; el proyecto recomienda dejar 2-3 segundos entre operaciones.</p>
+    </div>
+  </div>
+
+  <!-- 11.11 -->
+  <div class="cap-card">
+    <div class="cap-head"><span class="ic">📘</span><h3>11.11 · Facebook</h3><span class="chip chip-amber">OpenCLI · Solo escritorio</span></div>
+    <div class="cap-body">
+      <p><strong>Qué hace:</strong> busca usuarios, páginas y publicaciones; consulta perfiles y la lista de grupos visibles de tu cuenta.</p>
+      <p><strong>Para qué sirve:</strong> para consultar contenido público de Facebook sin usar la API oficial de Meta, que tiene un proceso de aprobación muy restrictivo.</p>
+      <p><strong>Qué necesita:</strong> <code>OpenCLI</code>, con sesión iniciada en <code>facebook.com</code> dentro de Chrome. Solo funciona en escritorio.</p>
+      <p><strong>Cómo se configura:</strong></p>
+      <pre><code>agent-reach install --system --channels facebook,instagram</code></pre>
+      <p>Después, confirma que la extensión de Chrome de <code>OpenCLI</code> está conectada (<code>opencli doctor</code>) e inicia sesión normalmente en facebook.com.</p>
+      <p><strong>Cómo se usa:</strong></p>
+      <pre><code>opencli facebook search "consulta" -f yaml
+opencli facebook profile NOMBRE_DE_USUARIO -f yaml
+opencli facebook feed --limit 10 -f yaml
+opencli facebook groups --limit 20 -f yaml</code></pre>
+
+      <h4>EJEMPLO A — Buscar una página o perfil (ejemplo mínimo)</h4>
+      <p><strong>Objetivo:</strong> encontrar una página pública sobre un tema.</p>
+      <p><strong>Preparación:</strong> sesión iniciada en facebook.com, <code>OpenCLI</code> conectado.</p>
+      <p><strong>Acción:</strong></p>
+      <pre><code>opencli facebook search "clubes de lectura Madrid" -f yaml</code></pre>
+      <p><strong>Resultado esperado:</strong> una lista de páginas o perfiles que coinciden con la búsqueda.</p>
+      <p><strong>Qué acaba de suceder:</strong> <code>OpenCLI</code> buscó dentro de Facebook usando tu propia sesión de navegador.</p>
+
+      <h4>EJEMPLO B — Consultar tus propios grupos (ejemplo práctico)</h4>
+      <p><strong>Objetivo:</strong> ver la lista de grupos a los que perteneces y su actividad reciente.</p>
+      <p><strong>Preparación:</strong> igual que el ejemplo A.</p>
+      <p><strong>Acción:</strong></p>
+      <pre><code>opencli facebook groups --limit 20 -f yaml</code></pre>
+      <p><strong>Resultado esperado:</strong> una lista de hasta 20 grupos con su nombre y actividad reciente visible desde tu cuenta.</p>
+      <p><strong>Qué acaba de suceder:</strong> consultaste información que solo es visible estando conectado con tu propia cuenta, no un buscador público.</p>
+      <p><strong>Variación:</strong> prueba <code>opencli facebook feed --limit 10 -f yaml</code> para ver tu propio muro de noticias.</p>
+      <p><strong>Limitaciones:</strong> la documentación es explícita: esta capacidad <strong>solo promete</strong> la lista de grupos visibles para tu cuenta y su actividad reciente; no ofrece ninguna API para leer publicaciones o comentarios de cualquier grupo arbitrario.</p>
+      <p><strong>Errores frecuentes:</strong> si aparece un error de tipo 429 o de inicio de sesión requerido, hay que volver a iniciar sesión manualmente en Chrome y reducir la frecuencia de las consultas.</p>
+    </div>
+  </div>
+
+  <!-- 11.12 -->
+  <div class="cap-card">
+    <div class="cap-head"><span class="ic">📷</span><h3>11.12 · Instagram</h3><span class="chip chip-amber">OpenCLI · Solo escritorio</span></div>
+    <div class="cap-body">
+      <p><strong>Qué hace:</strong> busca usuarios, consulta perfiles, publicaciones recientes de un usuario, y la sección Explorar.</p>
+      <p><strong>Para qué sirve:</strong> para consultar contenido público de Instagram.</p>
+      <p><strong>Qué necesita:</strong> <code>OpenCLI</code>, con sesión iniciada en <code>instagram.com</code> dentro de Chrome. Solo funciona en escritorio.</p>
+      <p><strong>Cómo se configura:</strong> igual que Facebook (sección 11.11); ambos se pueden activar con el mismo comando:</p>
+      <pre><code>agent-reach install --system --channels facebook,instagram</code></pre>
+      <p><strong>Cómo se usa:</strong></p>
+      <pre><code>opencli instagram search "consulta" -f yaml
+opencli instagram profile NOMBRE_DE_USUARIO -f yaml
+opencli instagram user NOMBRE_DE_USUARIO --limit 12 -f yaml
+opencli instagram explore --limit 20 -f yaml</code></pre>
+
+      <h4>EJEMPLO A — Buscar un usuario (ejemplo mínimo)</h4>
+      <p><strong>Objetivo:</strong> encontrar la cuenta de un usuario o marca.</p>
+      <p><strong>Preparación:</strong> sesión iniciada en instagram.com, <code>OpenCLI</code> conectado.</p>
+      <p><strong>Acción:</strong></p>
+      <pre><code>opencli instagram search "nasa" -f yaml</code></pre>
+      <p><strong>Resultado esperado:</strong> una lista de cuentas que coinciden con "nasa".</p>
+      <p><strong>Qué acaba de suceder:</strong> importante entenderlo bien: esta búsqueda encuentra <strong>usuarios</strong>, no publicaciones por palabra clave en todo Instagram.</p>
+
+      <h4>EJEMPLO B — Ver las publicaciones recientes de una cuenta (ejemplo práctico)</h4>
+      <p><strong>Objetivo:</strong> consultar el contenido reciente de una cuenta concreta.</p>
+      <p><strong>Preparación:</strong> igual que el ejemplo A. Necesitas saber el nombre de usuario exacto (puedes obtenerlo del ejemplo A).</p>
+      <p><strong>Acción:</strong></p>
+      <pre><code>opencli instagram user nasa --limit 12 -f yaml</code></pre>
+      <p><strong>Resultado esperado:</strong> las 12 publicaciones más recientes de esa cuenta.</p>
+      <p><strong>Qué acaba de suceder:</strong> primero identificaste el nombre de usuario exacto con una búsqueda, y después consultaste sus publicaciones recientes — es un proceso de dos pasos, no uno solo.</p>
+      <p><strong>Variación:</strong> prueba <code>opencli instagram explore --limit 20 -f yaml</code> para ver contenido recomendado en vez de buscar una cuenta concreta.</p>
+      <p><strong>Limitaciones:</strong> la documentación aclara que <code>instagram search</code> busca <strong>usuarios</strong>, no es un buscador de publicaciones por palabra clave en todo Instagram.</p>
+      <p><strong>Errores frecuentes:</strong> igual que Facebook, errores 429 o de sesión requerida se resuelven volviendo a iniciar sesión en Chrome y bajando la frecuencia de peticiones.</p>
+    </div>
+  </div>
+
+  <!-- 11.13 -->
+  <div class="cap-card">
+    <div class="cap-head"><span class="ic">📈</span><h3>11.13 · Xueqiu (雪球)</h3><span class="chip chip-amber">Requiere cookie</span></div>
+    <div class="cap-body">
+      <p><strong>Qué hace:</strong> consulta cotizaciones bursátiles, busca acciones, y lee publicaciones populares de Xueqiu, una red social china centrada en bolsa e inversión.</p>
+      <p><strong>Para qué sirve:</strong> para consultar datos de mercado y sentimiento de inversores sobre acciones concretas.</p>
+      <p><strong>Qué necesita:</strong> una cookie de sesión (Xueqiu exige haber iniciado sesión incluso para consultas básicas).</p>
+      <p><strong>Cómo se configura:</strong></p>
+      <ol>
+        <li>Inicia sesión en <code>xueqiu.com</code> dentro de Chrome.</li>
+        <li>Ejecuta:</li>
+      </ol>
+      <pre><code>agent-reach configure --from-browser chrome --platform xueqiu</code></pre>
+      <p>Este comando extrae <strong>únicamente</strong> el valor mínimo necesario de Xueqiu (<code>xq_a_token</code>); no toca cookies de ninguna otra plataforma.</p>
+      <p><strong>Cómo se usa:</strong></p>
+      <pre><code>opencli xueqiu search "NOMBRE_DE_LA_ACCIÓN" -f yaml
+opencli xueqiu stock CODIGO_BURSATIL -f yaml
+opencli xueqiu hot -f yaml</code></pre>
+
+      <h4>EJEMPLO A — Consultar la cotización de una acción (ejemplo mínimo)</h4>
+      <p><strong>Objetivo:</strong> ver el precio actual de una acción.</p>
+      <p><strong>Preparación:</strong> haber configurado la cookie como se explica arriba.</p>
+      <p><strong>Acción:</strong></p>
+      <pre><code>opencli xueqiu stock NVDA -f yaml</code></pre>
+      <p><strong>Resultado esperado:</strong> nombre de la empresa, precio actual y variación del día.</p>
+      <p><strong>Qué acaba de suceder:</strong> consultaste una cotización en tiempo real (con posible retraso) desde Xueqiu.</p>
+
+      <h4>EJEMPLO B — Buscar una acción y ver las publicaciones populares sobre ella (ejemplo práctico)</h4>
+      <p><strong>Objetivo:</strong> encontrar el código bursátil correcto y ver qué se comenta sobre esa acción.</p>
+      <p><strong>Preparación:</strong> igual que el ejemplo A.</p>
+      <p><strong>Acción:</strong></p>
+      <pre><code>opencli xueqiu search "nvidia" -f yaml
+opencli xueqiu hot -f yaml</code></pre>
+      <p><strong>Resultado esperado:</strong> primero el resultado de búsqueda con el código bursátil exacto, después las publicaciones más comentadas de la plataforma en general.</p>
+      <p><strong>Qué acaba de suceder:</strong> combinaste una búsqueda de identificación con una consulta de contenido social — un patrón habitual antes de consultar datos concretos de una acción.</p>
+      <p><strong>Variación:</strong> prueba <code>opencli xueqiu hot-stock -f yaml</code> para ver el ranking de acciones más comentadas, en vez de publicaciones sueltas.</p>
+      <p><strong>Limitaciones:</strong> los precios pueden llegar con retraso y <strong>no constituyen asesoramiento de inversión</strong>; la documentación oficial no ofrece garantías sobre la puntualidad de los datos.</p>
+      <p><strong>Errores frecuentes:</strong> si ves un error HTTP 400, casi siempre significa que la cookie de sesión caducó; repite el comando <code>agent-reach configure --from-browser chrome --platform xueqiu</code> tras volver a iniciar sesión en Chrome.</p>
+    </div>
+  </div>
+
+  <!-- 11.14 -->
+  <div class="cap-card">
+    <div class="cap-head"><span class="ic">💼</span><h3>11.14 · LinkedIn</h3><span class="chip chip-purple">uv/uvx + login</span></div>
+    <div class="cap-body">
+      <p><strong>Qué hace:</strong> lee perfiles completos, busca personas, consulta páginas de empresa y busca ofertas de empleo.</p>
+      <p><strong>Para qué sirve:</strong> para investigar perfiles profesionales, empresas u ofertas de trabajo.</p>
+      <p><strong>Qué necesita:</strong> la herramienta <code>uv</code>/<code>uvx</code>, y un inicio de sesión manual la primera vez (se abre una ventana de navegador).</p>
+      <p><strong>Cómo se configura:</strong></p>
+      <ol>
+        <li>Instala <code>uv</code> (que incluye <code>uvx</code>) siguiendo las instrucciones oficiales en <a href="https://docs.astral.sh/uv/getting-started/installation/" target="_blank" rel="noopener">https://docs.astral.sh/uv/getting-started/installation/</a></li>
+        <li>Conecta el servicio:</li>
+      </ol>
+      <pre><code>mcporter config add linkedin --command uvx --arg mcp-server-linkedin@latest --env UV_HTTP_TIMEOUT=300 --scope home</code></pre>
+      <ol start="3">
+        <li>Inicia sesión (se abrirá una ventana de navegador; inicia sesión ahí manualmente):</li>
+      </ol>
+      <pre><code>uvx mcp-server-linkedin@latest --login</code></pre>
+      <p><strong>Cómo se usa:</strong></p>
+      <pre><code>mcporter call linkedin.get_person_profile linkedin_username="nombre_de_usuario" sections="experience,education"
+mcporter call linkedin.search_people keywords="ingeniero de IA" location="Madrid"
+mcporter call linkedin.get_company_profile company_name="nombre_empresa" sections="posts,jobs"
+mcporter call linkedin.search_jobs keywords="desarrollador" location="Remoto" max_pages=2</code></pre>
+      <p><strong>Alternativa sin configurar nada (solo páginas públicas):</strong></p>
+      <pre><code>curl.exe -s "https://r.jina.ai/https://linkedin.com/in/nombre_de_usuario"</code></pre>
+
+      <h4>EJEMPLO A — Consultar el perfil de una persona (ejemplo mínimo)</h4>
+      <p><strong>Objetivo:</strong> obtener la experiencia y formación de un perfil público.</p>
+      <p><strong>Preparación:</strong> haber completado la configuración de arriba.</p>
+      <p><strong>Acción:</strong></p>
+      <pre><code>mcporter call linkedin.get_person_profile linkedin_username="nombre_de_usuario" sections="experience,education"</code></pre>
+      <p><strong>Resultado esperado:</strong> historial laboral y formación del perfil consultado.</p>
+      <p><strong>Qué acaba de suceder:</strong> el servidor MCP de LinkedIn, usando tu sesión iniciada, consultó ese perfil por ti.</p>
+
+      <h4>EJEMPLO B — Buscar ofertas de empleo (ejemplo práctico)</h4>
+      <p><strong>Objetivo:</strong> encontrar ofertas de trabajo que coincidan con unos criterios.</p>
+      <p><strong>Preparación:</strong> igual que el ejemplo A.</p>
+      <p><strong>Acción:</strong></p>
+      <pre><code>mcporter call linkedin.search_jobs keywords="desarrollador Python" location="Remoto" max_pages=2</code></pre>
+      <p><strong>Resultado esperado:</strong> una lista de ofertas de empleo con título, empresa y ubicación.</p>
+      <p><strong>Qué acaba de suceder:</strong> hiciste una búsqueda estructurada de empleo, en vez de consultar un perfil concreto.</p>
+      <p><strong>Variación:</strong> prueba <code>mcporter call linkedin.get_company_profile company_name="nombre_empresa" sections="posts,jobs"</code> para investigar una empresa en vez de una persona.</p>
+      <p><strong>Limitaciones:</strong> sin la configuración de <code>uvx</code> y el inicio de sesión, solo funciona la alternativa de páginas públicas vía Jina Reader, con información mucho más limitada.</p>
+      <p><strong>Errores frecuentes:</strong> la documentación oficial consultada no detalla códigos de error específicos para este servicio más allá de lo ya explicado.</p>
+    </div>
+  </div>
+
+  <!-- 11.15 -->
+  <div class="cap-card">
+    <div class="cap-head"><span class="ic">🎙️</span><h3>11.15 · Xiaoyuzhou Podcast (小宇宙)</h3><span class="chip chip-purple">ffmpeg + Groq</span></div>
+    <div class="cap-body">
+      <p><strong>Qué hace:</strong> transcribe episodios de podcast del servicio chino Xiaoyuzhou, convirtiendo el audio en texto completo.</p>
+      <p><strong>Para qué sirve:</strong> para leer (en vez de escuchar) el contenido de un episodio de podcast.</p>
+      <p><strong>Qué necesita:</strong> <code>ffmpeg</code> (para preparar el audio) y una clave gratuita de Groq (para la transcripción con inteligencia artificial Whisper).</p>
+      <p><strong>Cómo se configura:</strong></p>
+      <ol>
+        <li>Instala <code>ffmpeg</code>. En Windows 11, la forma más simple es con <code>winget</code>:</li>
+      </ol>
+      <pre><code>winget install ffmpeg</code></pre>
+      <ol start="2">
+        <li>Consigue una clave gratuita de Groq (no pide tarjeta de crédito):
+          <ul>
+            <li>Entra en <a href="https://console.groq.com" target="_blank" rel="noopener">https://console.groq.com</a></li>
+            <li>Inicia sesión con tu cuenta de Google o GitHub (o regístrate)</li>
+            <li>Ve a <strong>API Keys</strong> → <strong>Create API Key</strong></li>
+            <li>Copia la clave (empieza por <code>gsk_</code>)</li>
+          </ul>
+        </li>
+        <li>Guarda la clave en Agent Reach:</li>
+      </ol>
+      <pre><code>agent-reach configure groq-key</code></pre>
+      <ol start="4">
+        <li>Activa el canal:</li>
+      </ol>
+      <pre><code>agent-reach install --env=auto --system --channels=xiaoyuzhou</code></pre>
+      <p><strong>Cómo se usa:</strong></p>
+      <pre><code>bash ~/.agent-reach/tools/xiaoyuzhou/transcribe.sh "URL_DEL_EPISODIO"</code></pre>
+      <div class="callout warn">
+        <span class="ct">Advertencia</span>
+        Este script concreto se distribuye para entornos tipo Unix/Bash; en Windows puro, ejecútalo desde una terminal Bash disponible en tu sistema (por ejemplo, la incluida con Git for Windows) si <code>bash</code> no está disponible de forma nativa en tu PowerShell. La documentación oficial consultada no detalla una versión nativa de PowerShell para este script en concreto.
+      </div>
+
+      <h4>EJEMPLO A — Transcribir un episodio (ejemplo mínimo)</h4>
+      <p><strong>Objetivo:</strong> obtener el texto completo de un episodio de podcast.</p>
+      <p><strong>Preparación:</strong> haber completado la configuración de arriba.</p>
+      <p><strong>Acción:</strong></p>
+      <pre><code>bash ~/.agent-reach/tools/xiaoyuzhou/transcribe.sh "https://www.xiaoyuzhoufm.com/episode/ID_DEL_EPISODIO"</code></pre>
+      <p><strong>Resultado esperado:</strong> un archivo Markdown en la carpeta temporal del sistema (<code>/tmp/</code> en el script original) con la transcripción completa en chino.</p>
+      <p><strong>Qué acaba de suceder:</strong> el script descargó el audio, lo preparó con <code>ffmpeg</code>, lo envió a Groq (que ejecuta el modelo Whisper) y guardó el texto resultante.</p>
+
+      <h4>EJEMPLO B — Transcribir con mejor puntuación (ejemplo práctico)</h4>
+      <p><strong>Objetivo:</strong> obtener una transcripción con puntuación y párrafos mejor organizados.</p>
+      <p><strong>Preparación:</strong> igual que el ejemplo A.</p>
+      <p><strong>Acción:</strong></p>
+      <pre><code>bash ~/.agent-reach/tools/xiaoyuzhou/transcribe.sh --polish "https://www.xiaoyuzhoufm.com/episode/ID_DEL_EPISODIO"</code></pre>
+      <p><strong>Resultado esperado:</strong> el mismo tipo de transcripción, pero pasada por un segundo modelo de IA gratuito que mejora la puntuación y la división en párrafos.</p>
+      <p><strong>Qué acaba de suceder:</strong> añadiste un paso extra de "pulido" del texto; tarda unos segundos más (aproximadamente 7 segundos más para un episodio de 9 minutos, según la documentación del proyecto).</p>
+      <p><strong>Variación:</strong> prueba con un archivo de audio local en vez de una URL: <code>bash ~/.agent-reach/tools/xiaoyuzhou/transcribe.sh --polish ./mi_audio.mp3</code></p>
+      <p><strong>Limitaciones:</strong> la cuenta gratuita de Groq permite aproximadamente 2 horas de audio por hora, y al superar ese límite hay que esperar unos 15 minutos; para episodios de más de 2 horas, la documentación recomienda procesarlos por partes. Whisper no distingue entre distintas personas hablando.</p>
+      <p><strong>Errores frecuentes:</strong> si Groq da un error de límite alcanzado (código 429), el propio proyecto reintenta automáticamente incluyendo de nuevo las instrucciones de puntuación; si configuraste también una clave de OpenAI y usas explícitamente <code>--allow-provider-fallback</code>, el sistema puede enviar el mismo audio a OpenAI como respaldo (esto puede generar costes en OpenAI, así que solo actívalo si el contenido se puede compartir con ambos proveedores).</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ EJEMPLOS -->
+<section class="section" id="ejemplos">
+  <div class="sec-head">
+    <div class="sec-icon">💡</div>
+    <h2>Más ejemplos prácticos</h2>
+  </div>
+
+  <p>Estos ejemplos usan una sola capacidad cada vez, pero de una forma un poco más creativa que en la sección de capacidades.</p>
+
+  <div class="card card-accent">
+    <h3 style="margin-top:0">Ejemplo — Vigilar los lanzamientos (releases) de un proyecto de GitHub con RSS</h3>
+    <p>GitHub ofrece un feed RSS de releases para cualquier repositorio público, sin necesidad de usar <code>gh</code>:</p>
+    <pre><code>python -c "
+import feedparser
+for e in feedparser.parse('https://github.com/Panniantong/Agent-Reach/releases.atom').entries[:5]:
+    print(f'{e.title} - {e.link}')
+"</code></pre>
+    <p><strong>Qué acaba de suceder:</strong> combinaste el conocimiento de que GitHub publica feeds RSS para releases con la capacidad de RSS (11.2), sin necesitar la capacidad de GitHub (11.3) para este caso concreto.</p>
+  </div>
+
+  <div class="card card-accent">
+    <h3 style="margin-top:0">Ejemplo — Comprobar rápidamente si tu instalación está sana, de un vistazo</h3>
+    <pre><code>agent-reach doctor --json</code></pre>
+    <p><strong>Qué acaba de suceder:</strong> en vez de leer el informe en texto, pediste el mismo informe en formato JSON. Esto es exactamente lo que tu agente de IA usa internamente para decidir qué herramienta llamar para cada plataforma (el campo <code>active_backend</code>).</p>
+  </div>
+</section>
+
+<!-- ============================================================ EJERCICIOS -->
+<section class="section" id="ejercicios">
+  <div class="sec-head">
+    <div class="sec-icon">📝</div>
+    <h2>Ejercicios</h2>
+  </div>
+
+  <p>Practica cada capacidad tú mismo antes de seguir. No incluimos las soluciones completas: son sencillas de comprobar por ti mismo si el resultado tiene sentido.</p>
+
+  <div class="grid2">
+    <div class="card card-green">
+      <span class="chip chip-green">Fácil</span>
+      <h4 style="margin-top:10px">Ejercicio 1</h4>
+      <p>Usa la capacidad de páginas web (11.1) para leer el artículo de Wikipedia sobre "Aprendizaje automático" en tu idioma.</p>
+    </div>
+    <div class="card card-green">
+      <span class="chip chip-green">Fácil</span>
+      <h4 style="margin-top:10px">Ejercicio 2</h4>
+      <p>Usa RSS (11.2) para obtener los 3 títulos más recientes de un blog que sigas habitualmente.</p>
+    </div>
+    <div class="card card-amber">
+      <span class="chip chip-amber">Medio</span>
+      <h4 style="margin-top:10px">Ejercicio 3</h4>
+      <p>Usa GitHub (11.3) para buscar los 5 repositorios más populares relacionados con "agentes de IA" y anota cuál tiene más estrellas.</p>
+    </div>
+    <div class="card card-amber">
+      <span class="chip chip-amber">Medio</span>
+      <h4 style="margin-top:10px">Ejercicio 4</h4>
+      <p>Usa YouTube (11.4) para extraer los subtítulos de un vídeo corto (menos de 5 minutos) y cuenta cuántas veces se menciona una palabra concreta.</p>
+    </div>
+    <div class="card card-red">
+      <span class="chip chip-red">Avanzado</span>
+      <h4 style="margin-top:10px">Ejercicio 5</h4>
+      <p><strong>Requiere haber configurado Twitter (11.8):</strong> usa <code>twitter user-posts</code> para consultar una cuenta pública y resume de qué habló en sus últimos 10 mensajes.</p>
+    </div>
+    <div class="card card-red">
+      <span class="chip chip-red">Avanzado</span>
+      <h4 style="margin-top:10px">Ejercicio 6</h4>
+      <p><strong>Requiere haber configurado Xiaoyuzhou (11.15):</strong> transcribe un episodio corto de podcast y compara el resultado con y sin la opción <code>--polish</code>.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ EXPERIMENTOS -->
+<section class="section" id="experimentos">
+  <div class="sec-head">
+    <div class="sec-icon">🔬</div>
+    <h2>Experimentos</h2>
+  </div>
+
+  <p>Estos experimentos están pensados para que veas con tus propios ojos <strong>por qué</strong> las cosas funcionan como funcionan, no solo que funcionan.</p>
+
+  <div class="card card-purple">
+    <h3 style="margin-top:0">Experimento 1 — Qué pasa si guardas la cookie de Twitter pero no defines las variables de entorno</h3>
+    <ol>
+      <li>Ejecuta <code>agent-reach configure twitter-cookies</code> y pega tu cookie exportada.</li>
+      <li>Sin definir <code>$env:TWITTER_AUTH_TOKEN</code> ni <code>$env:TWITTER_CT0</code>, ejecuta directamente:
+        <pre><code>twitter feed -n 5</code></pre>
+      </li>
+      <li><strong>Qué vas a observar:</strong> el comando falla o indica credenciales ausentes, aunque <code>agent-reach doctor</code> muestre Twitter como configurado.</li>
+      <li><strong>Por qué pasa esto:</strong> la documentación oficial lo aclara explícitamente: el valor que guarda <code>agent-reach configure</code> solo sirve para que <code>doctor</code> compruebe que <em>existe</em> una configuración; no la inyecta automáticamente en cada comando que ejecutes. Las variables de entorno hay que definirlas tú mismo en cada ventana de terminal donde vayas a usar Twitter.</li>
+    </ol>
+  </div>
+
+  <div class="card card-purple">
+    <h3 style="margin-top:0">Experimento 2 — Comparar la búsqueda vía <code>bili-cli</code> y vía <code>OpenCLI</code> para el mismo vídeo de Bilibili</h3>
+    <ol>
+      <li>Ejecuta <code>bili video BVxxxxxxxxx</code> para un vídeo cualquiera.</li>
+      <li>Ejecuta <code>opencli bilibili subtitle BVxxxxxxxxx</code> para ese mismo vídeo.</li>
+      <li><strong>Qué vas a observar:</strong> el primero te da metadatos (título, autor, duración) sin necesidad de sesión; el segundo te da el subtítulo completo, pero requiere que Chrome esté abierto con la extensión conectada.</li>
+      <li><strong>Por qué pasa esto:</strong> son dos herramientas distintas, cada una responsable de una parte distinta de la información de Bilibili; ninguna de las dos lo hace todo por sí sola.</li>
+    </ol>
+  </div>
+
+  <div class="card card-purple">
+    <h3 style="margin-top:0">Experimento 3 — Provocar (de forma controlada) el fallo conocido de <code>twitter search</code></h3>
+    <ol>
+      <li>Ejecuta <code>twitter search "prueba" -n 1</code> un par de veces seguidas.</li>
+      <li>Si falla, sigue la cadena de alternativas documentada en la sección 11.8: reintentar, actualizar la herramienta, usar <code>opencli twitter search</code>, o recurrir a <code>twitter feed</code>/<code>twitter user-posts</code>.</li>
+      <li><strong>Qué acabas de comprobar:</strong> que Agent Reach no oculta los fallos conocidos, sino que los documenta junto con un plan concreto de qué hacer cuando ocurren — esto es justo lo que hace <code>agent-reach doctor</code> quintaesencialmente: decirte qué funciona <em>ahora mismo</em>, no lo que debería funcionar en teoría.</li>
+    </ol>
+  </div>
+</section>
+
+<!-- ============================================================ PROYECTOS -->
+<section class="section" id="proyectos">
+  <div class="sec-head">
+    <div class="sec-icon">🚀</div>
+    <h2>Combinar capacidades y proyectos progresivos</h2>
+  </div>
+
+  <h3>Combinar capacidades</h3>
+  <p>Las capacidades individuales se vuelven mucho más útiles cuando las encadenas. Aquí tienes dos ejemplos de cómo tu agente combinaría varias.</p>
+
+  <div class="card card-green">
+    <h4 style="margin-top:0">Combinación A — Investigar un proyecto de código abierto a fondo</h4>
+    <ol>
+      <li><strong>GitHub (11.3):</strong> <code>gh repo view owner/repositorio</code> para entender de qué trata.</li>
+      <li><strong>Páginas web (11.1):</strong> <code>curl.exe -s "https://r.jina.ai/URL_DE_LA_DOCUMENTACION"</code> para leer su documentación oficial si vive fuera de GitHub.</li>
+      <li><strong>Búsqueda web (11.7):</strong> <code>mcporter call exa.web_search_exa query="opiniones sobre NOMBRE_DEL_PROYECTO" numResults=5</code> para ver qué opina la gente fuera del propio proyecto.</li>
+    </ol>
+    <p><strong>Resultado:</strong> una visión completa —qué es, qué dice su propia documentación, y qué opina gente externa— sin abrir un navegador.</p>
+  </div>
+
+  <div class="card card-green">
+    <h4 style="margin-top:0">Combinación B — Investigar cómo reacciona la comunidad a un lanzamiento de producto</h4>
+    <ol>
+      <li><strong>Reddit (11.9):</strong> <code>opencli reddit search "nombre del producto" -f yaml</code> para ver debates técnicos.</li>
+      <li><strong>Twitter (11.8):</strong> <code>twitter search "nombre del producto"</code> (o su alternativa vía <code>opencli</code>) para ver reacciones en tiempo real.</li>
+      <li><strong>XiaoHongShu (11.10):</strong> <code>opencli xiaohongshu search "nombre del producto" -f yaml</code> si el producto también tiene presencia en el mercado chino.</li>
+    </ol>
+    <p><strong>Resultado:</strong> una foto de cómo distintas comunidades, en plataformas muy distintas, están hablando del mismo tema — algo que tardarías mucho más tiempo en reunir manualmente visitando cada red por separado.</p>
+  </div>
+
+  <h3>Proyectos progresivos</h3>
+
+  <div class="card card-accent">
+    <span class="chip chip-green">Fácil</span>
+    <h3 style="margin-top:10px">PROYECTO 1 — Tu propio resumen de noticias</h3>
+    <p><strong>Objetivo:</strong> crear, con ayuda de tu agente de IA, un resumen diario de 3 fuentes RSS que te interesen.</p>
+    <p><strong>Capacidades que vas a usar:</strong> RSS (11.2) y páginas web (11.1).</p>
+    <p><strong>Pasos sugeridos:</strong></p>
+    <ol>
+      <li>Elige tres fuentes RSS (por ejemplo, un blog técnico, un medio de noticias y un blog de un proyecto de código abierto).</li>
+      <li>Pide a tu agente que use la capacidad de RSS para traer los 5 titulares más recientes de cada una.</li>
+      <li>Para los tres titulares que más te interesen, pide a tu agente que use la capacidad de páginas web para traer el artículo completo y hacer un resumen de dos frases de cada uno.</li>
+    </ol>
+    <p><strong>Qué habrás conseguido:</strong> un flujo repetible que podrías ejecutar cada mañana para estar al día sin visitar ninguna web manualmente.</p>
+  </div>
+
+  <div class="card card-amber">
+    <span class="chip chip-amber">Medio</span>
+    <h3 style="margin-top:10px">PROYECTO 2 — Monitor de menciones de un tema</h3>
+    <p><strong>Objetivo:</strong> ver cómo se habla de un tema (un producto, una tecnología, tu propio proyecto) en varias plataformas distintas.</p>
+    <p><strong>Capacidades que vas a usar:</strong> al menos tres de: Reddit (11.9), Twitter (11.8), GitHub (11.3), V2EX (11.6), búsqueda web (11.7).</p>
+    <p><strong>Pasos sugeridos:</strong></p>
+    <ol>
+      <li>Elige un tema concreto y específico (cuanto más concreto, mejores resultados).</li>
+      <li>Busca ese tema en cada una de las plataformas elegidas por separado.</li>
+      <li>Pide a tu agente que junte todos los resultados en una sola lista, ordenada por plataforma, señalando si el tono general es positivo, negativo o neutral en cada una.</li>
+    </ol>
+    <p><strong>Qué habrás conseguido:</strong> una vista comparada de cómo un mismo tema se percibe de forma distinta según la comunidad.</p>
+  </div>
+
+  <div class="card card-red">
+    <span class="chip chip-red">Avanzado</span>
+    <h3 style="margin-top:10px">PROYECTO 3 — Ficha de investigación de un repositorio de código abierto</h3>
+    <p><strong>Objetivo:</strong> generar automáticamente una ficha completa sobre un proyecto de código abierto que te interese.</p>
+    <p><strong>Capacidades que vas a usar:</strong> GitHub (11.3), páginas web (11.1), búsqueda web (11.7), y opcionalmente YouTube (11.4) si existen vídeos tutoriales sobre el proyecto.</p>
+    <p><strong>Pasos sugeridos:</strong></p>
+    <ol>
+      <li>Usa GitHub para obtener la descripción, estrellas, Issues abiertos y últimos Releases del proyecto.</li>
+      <li>Usa páginas web para leer su documentación oficial si tiene una web separada del repositorio.</li>
+      <li>Usa búsqueda web para encontrar 3-5 artículos u opiniones externas sobre el proyecto.</li>
+      <li>Usa YouTube (si aplica) para buscar un vídeo tutorial y extraer sus puntos clave de los subtítulos.</li>
+      <li>Pide a tu agente que junte todo en una ficha de una página: qué es, para qué sirve, estado actual del proyecto (activo/abandonado, según sus Issues y Releases recientes), y qué dice la gente fuera del propio proyecto.</li>
+    </ol>
+    <p><strong>Qué habrás conseguido:</strong> el tipo de investigación que normalmente tomaría media hora de búsquedas manuales, hecho en minutos y de forma repetible para cualquier otro proyecto.</p>
+  </div>
+</section>
+
+<!-- ============================================================ PROYECTO FINAL -->
+<section class="section" id="proyectofinal">
+  <div class="sec-head">
+    <div class="sec-icon">🏁</div>
+    <h2>Proyecto final — Informe de vigilancia de un tema, de principio a fin</h2>
+  </div>
+
+  <p>Este proyecto junta prácticamente todo lo que has aprendido en este tutorial.</p>
+
+  <div class="card card-purple">
+    <p><strong>Objetivo:</strong> producir, con tu agente de IA, un informe completo sobre un tema de tu elección, combinando fuentes técnicas, sociales y de noticias, y guardarlo como un documento que puedas releer más tarde.</p>
+
+    <h4>Capacidades a combinar (elige al menos 5)</h4>
+    <ul>
+      <li>Páginas web (11.1) — para leer artículos completos.</li>
+      <li>RSS (11.2) — para fuentes que sigues habitualmente.</li>
+      <li>GitHub (11.3) — si el tema tiene relación con algún proyecto de código abierto.</li>
+      <li>YouTube (11.4) o Bilibili (11.5) — si existen vídeos relevantes.</li>
+      <li>Búsqueda web (11.7) — para descubrir fuentes que no conocías.</li>
+      <li>Reddit (11.9) o Twitter (11.8) — para el pulso de la comunidad.</li>
+    </ul>
+
+    <h4>Pasos</h4>
+    <ol>
+      <li><strong>Define el tema con precisión.</strong> No "inteligencia artificial" (demasiado amplio), sino algo como "herramientas para que agentes de IA naveguen por internet en 2026".</li>
+      <li><strong>Reúne fuentes técnicas:</strong> usa GitHub y búsqueda web para encontrar proyectos y documentación relevantes.</li>
+      <li><strong>Reúne el pulso social:</strong> usa Reddit y/o Twitter para ver qué opina la gente que ya usa este tipo de herramientas.</li>
+      <li><strong>Reúne contenido audiovisual (opcional):</strong> si encuentras un vídeo relevante, extrae sus subtítulos y resúmelos.</li>
+      <li><strong>Pide a tu agente que redacte un informe</strong> con esta estructura: introducción del tema, qué dicen las fuentes técnicas, qué dice la comunidad, y una conclusión con tu propia valoración de hacia dónde va el tema.</li>
+      <li><strong>Guarda el informe</strong> como un archivo Markdown en tu ordenador, para poder consultarlo más adelante o compararlo con una versión futura.</li>
+    </ol>
+
+    <div class="callout example">
+      <span class="ct">Ejemplo</span>
+      <strong>Cómo saber que lo conseguiste:</strong> si al leer el informe final aprendes algo que no sabías antes de empezar, y si podrías repetir todo el proceso para un tema distinto sin tener que volver a leer este tutorial, el proyecto está completo.
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ ERRORES -->
+<section class="section" id="errores">
+  <div class="sec-head">
+    <div class="sec-icon">🛠️</div>
+    <h2>Errores y soluciones</h2>
+  </div>
+
+  <p>Esta sección recoge los problemas reales documentados por el propio proyecto (incluido su archivo interno de resolución de problemas), más los específicos de Windows que hemos ido señalando a lo largo del tutorial.</p>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead>
+        <tr><th>Síntoma</th><th>Causa</th><th>Solución</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>python3</code> o <code>py -3</code> abre la Microsoft Store en vez de ejecutar Python</td>
+          <td>El "acceso directo" de Python de la Store no es una instalación real</td>
+          <td>Instala Python desde python.org (PASO 2) y asegúrate de marcar "Add python.exe to PATH"</td>
+        </tr>
+        <tr>
+          <td>Error <code>externally-managed-environment</code> (PEP 668) al instalar con <code>pip</code></td>
+          <td>Tu Python está gestionado por el sistema y protege contra instalaciones globales accidentales</td>
+          <td>Usa <code>pipx install ...</code> (PASO 7) en vez de <code>pip install</code> directo, o crea un entorno virtual como se explica en esa misma sección</td>
+        </tr>
+        <tr>
+          <td><code>agent-reach</code> o <code>pipx</code> no se reconocen como comando tras instalarlos</td>
+          <td>La carpeta donde se instalan no está todavía en el PATH de la sesión actual</td>
+          <td>Cierra y vuelve a abrir PowerShell por completo (no basta con una pestaña nueva)</td>
+        </tr>
+        <tr>
+          <td><code>agent-reach doctor</code> muestra Xueqiu con error HTTP 400</td>
+          <td>La cookie de sesión de Xueqiu caducó</td>
+          <td>Vuelve a iniciar sesión en xueqiu.com dentro de Chrome y repite <code>agent-reach configure --from-browser chrome --platform xueqiu</code></td>
+        </tr>
+        <tr>
+          <td>Los comandos de <code>twitter</code> fallan aunque <code>agent-reach doctor</code> muestre Twitter como configurado</td>
+          <td>Guardar la cookie con <code>agent-reach configure twitter-cookies</code> no define las variables de entorno automáticamente</td>
+          <td>Define <code>$env:TWITTER_AUTH_TOKEN</code> y <code>$env:TWITTER_CT0</code> en la misma ventana de PowerShell antes de usar <code>twitter</code> (ver Experimento 1)</td>
+        </tr>
+        <tr>
+          <td><code>twitter search</code> falla de forma intermitente</td>
+          <td>Twitter/X cambia con frecuencia su funcionamiento interno; es un problema conocido y documentado por el propio proyecto</td>
+          <td>Sigue la cadena de alternativas: reintentar → actualizar <code>twitter-cli</code> → usar <code>opencli twitter search</code> → usar comandos más estables como <code>twitter feed</code></td>
+        </tr>
+        <tr>
+          <td><code>opencli</code> no puede acceder a XiaoHongShu/Reddit/Facebook/Instagram/Bilibili</td>
+          <td>No hay sesión iniciada en Chrome, o la extensión de <code>OpenCLI</code> no está conectada</td>
+          <td>Comprueba con <code>opencli doctor</code>; inicia sesión manualmente en la web correspondiente dentro de Chrome</td>
+        </tr>
+        <tr>
+          <td>Caracteres chinos se ven como símbolos extraños en PowerShell</td>
+          <td>Codificación de consola distinta a UTF-8</td>
+          <td>El propio código de Agent Reach ya configura automáticamente la salida en UTF-8 al ejecutarse en Windows; si el problema persiste, ejecuta <code>chcp 65001</code> en PowerShell antes de usar <code>agent-reach</code></td>
+        </tr>
+        <tr>
+          <td>Un canal que antes funcionaba ahora aparece en rojo (<code>[X]</code>) tras una actualización</td>
+          <td>Puede haberse retirado o sustituido el backend que usaba</td>
+          <td><code>agent-reach doctor</code> explica siempre, en esa misma línea, la causa y el arreglo concreto</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout info">
+    <span class="ct">Regla general de diagnóstico</span>
+    Empieza siempre por <code>agent-reach doctor</code>. La documentación oficial insiste en que este comando da, para cada plataforma con más de una herramienta posible (XiaoHongShu, Reddit, Bilibili, Twitter), el nombre exacto de la herramienta que está usando en este momento (<code>当前后端</code>, "backend actual"), y un mensaje de arreglo específico si algo falla — no un mensaje genérico.
+  </div>
+</section>
+
+<!-- ============================================================ SEGURIDAD -->
+<section class="section" id="seguridad">
+  <div class="sec-head">
+    <div class="sec-icon">🔒</div>
+    <h2>Seguridad</h2>
+  </div>
+
+  <p>Agent Reach maneja información sensible: cookies de sesión de tus propias cuentas y, si activas Xiaoyuzhou, una clave de API de Groq. Estas son las prácticas de seguridad reales documentadas por el proyecto:</p>
+
+  <div class="card card-red">
+    <ul>
+      <li><strong>Usa una cuenta secundaria para Twitter/X</strong>, no tu cuenta principal. Es una recomendación explícita del propio proyecto: el acceso automatizado por cookie puede llevar a la plataforma a limitar la cuenta.</li>
+      <li><strong>Nunca compartas tu cadena de cookies exportada</strong> con nadie que no sea tu propio agente de IA local. Esa cadena da acceso completo a tu sesión en esa web, igual que una contraseña.</li>
+      <li><strong>Para automatización sin supervisión, usa el modo <code>--stdin</code></strong> al ejecutar <code>agent-reach configure</code>, en vez de escribir la cookie como argumento visible del comando; así evitas que quede guardada en el historial de la terminal.</li>
+      <li><strong>Dónde se guarda todo:</strong> tus credenciales quedan en <code>C:\Users\TU_USUARIO\.agent-reach\config.yaml</code>. Ese archivo no debe compartirse ni subirse a ningún repositorio de código.</li>
+      <li><strong>Sobre los permisos del archivo de configuración:</strong> en sistemas tipo Unix, Agent Reach restringe el acceso a ese archivo automáticamente (equivalente a <code>chmod 600</code>, solo tu usuario puede leerlo); la documentación del propio código señala que esa restricción concreta <strong>se omite en Windows</strong>, porque el sistema de permisos de Windows funciona de otra forma. En la práctica, la protección real en Windows es que solo tu propia cuenta de usuario tiene acceso a tu carpeta personal (<code>C:\Users\TU_USUARIO\</code>) por defecto.</li>
+      <li><strong>No trates los datos de mercado de Xueqiu como asesoramiento de inversión</strong>: pueden llegar con retraso.</li>
+      <li><strong>Si compartes tu agente o tu ordenador con otras personas</strong>, cualquiera con acceso a tu carpeta de usuario podría leer <code>config.yaml</code> y usar tus sesiones. Trátalo con el mismo cuidado que un gestor de contraseñas.</li>
+      <li><strong>Si encuentras una vulnerabilidad de seguridad real en el propio Agent Reach</strong> (no un problema de uso, sino un fallo del programa), el proyecto pide reportarlo de forma privada a través de GitHub Security Advisories (<a href="https://github.com/Panniantong/Agent-Reach/security/advisories/new" target="_blank" rel="noopener">https://github.com/Panniantong/Agent-Reach/security/advisories/new</a>), nunca en un Issue público.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============================================================ MANTENIMIENTO -->
+<section class="section" id="mantenimiento">
+  <div class="sec-head">
+    <div class="sec-icon">🔄</div>
+    <h2>Actualización, desinstalación y resumen final</h2>
+  </div>
+
+  <h3>Actualización</h3>
+  <p>Agent Reach se actualiza con dos pasos: revisar si hay una versión nueva, y aplicarla.</p>
+
+  <div class="step">
+    <div class="step-head"><span class="step-num">PASO 12</span><h4>Comprobar si hay una versión más reciente</h4></div>
+    <div class="step-sub">Acción</div>
+    <pre><code>agent-reach check-update</code></pre>
+    <div class="step-sub">Qué debería ocurrir</div>
+    <p>Si ya tienes la última versión, verás un mensaje indicándolo; si no, verás qué ha cambiado en la versión nueva.</p>
+  </div>
+
+  <div class="step">
+    <div class="step-head"><span class="step-num">PASO 13</span><h4>Actualizar Agent Reach</h4></div>
+    <div class="step-sub">Acción (con <code>pipx</code>, la forma que usamos en este tutorial)</div>
+    <pre><code>pipx install --force https://github.com/Panniantong/agent-reach/archive/main.zip</code></pre>
+  </div>
+
+  <div class="step">
+    <div class="step-head"><span class="step-num">PASO 14</span><h4>Actualizar las herramientas que ya tienes instaladas</h4></div>
+    <p>Este paso solo actualiza lo que <strong>ya</strong> tienes en tu sistema; no instala nada nuevo que no hayas pedido:</p>
+    <pre><code>pipx upgrade twitter-cli
+pipx upgrade bilibili-cli
+pipx upgrade xiaohongshu-cli
+npm update -g mcporter
+npm update -g "@jackwener/opencli"</code></pre>
+    <div class="callout info">
+      <span class="ct">Info</span>
+      Solo ejecuta las líneas correspondientes a las herramientas que realmente hayas instalado; el resto no hace nada si la herramienta no existe en tu sistema.
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-head"><span class="step-num">PASO 15</span><h4>Verificar que todo sigue funcionando</h4></div>
+    <pre><code>agent-reach version
+agent-reach doctor</code></pre>
+    <p><strong>Qué debería ocurrir:</strong> el mismo tipo de informe que viste en el PASO 10, con los canales que ya tenías activos otra vez en verde.</p>
+    <div class="callout warn">
+      <span class="ct">Un detalle importante de cómo se comporta Agent Reach al actualizar</span>
+      Nunca desinstala por su cuenta ninguna herramienta que ya tuvieras, aunque exista una alternativa mejor. Si prefieres cambiar de una herramienta a otra (por ejemplo, pasar de una herramienta antigua a <code>OpenCLI</code>), es una decisión que tomas tú explícitamente, no algo que ocurra solo.
+    </div>
+  </div>
+
+  <h3>Desinstalación</h3>
+  <p>Puedes deshacer, paso a paso, exactamente lo que hiciste en este tutorial.</p>
+
+  <div class="step">
+    <div class="step-head"><span class="step-num">PASO 16</span><h4>Ver qué se eliminaría, sin borrar nada todavía</h4></div>
+    <pre><code>agent-reach uninstall --dry-run</code></pre>
+    <p><strong>Qué debería ocurrir:</strong> una lista de lo que se borraría si confirmas: tu carpeta de configuración (<code>~/.agent-reach/</code>, con todas tus cookies, tokens y claves guardadas) y los archivos de guía instalados para tu agente de IA. Con <code>--dry-run</code>, nada se borra todavía.</p>
+  </div>
+
+  <div class="step">
+    <div class="step-head"><span class="step-num">PASO 17</span><h4>Eliminar la configuración de Agent Reach de verdad</h4></div>
+    <pre><code>agent-reach uninstall</code></pre>
+    <p>Si prefieres conservar tu configuración (cookies, tokens) y solo quitar los archivos de guía del agente:</p>
+    <pre><code>agent-reach uninstall --keep-config</code></pre>
+    <p><strong>Qué debería ocurrir:</strong> un resumen de lo que se eliminó: la carpeta <code>~/.agent-reach/</code> con todas tus credenciales, y los archivos de guía (<code>SKILL.md</code>) instalados para tu agente de IA en las carpetas que Agent Reach detectó.</p>
+  </div>
+
+  <div class="step">
+    <div class="step-head"><span class="step-num">PASO 18</span><h4>Eliminar el propio programa <code>agent-reach</code> (opcional)</h4></div>
+    <pre><code>pipx uninstall agent-reach</code></pre>
+  </div>
+
+  <div class="step">
+    <div class="step-head"><span class="step-num">PASO 19</span><h4>Eliminar las herramientas individuales que instalaste (opcional)</h4></div>
+    <p>Solo si quieres una limpieza completa; ninguna de ellas se elimina automáticamente porque otros programas tuyos podrían seguir usándolas:</p>
+    <pre><code>npm uninstall -g mcporter
+npm uninstall -g "@jackwener/opencli"
+pipx uninstall twitter-cli
+pipx uninstall bilibili-cli
+pipx uninstall xiaohongshu-cli</code></pre>
+    <div class="callout info">
+      <span class="ct">Info</span>
+      Node.js, <code>gh</code> CLI, <code>pipx</code> y Python en sí no los instaló Agent Reach: si quieres desinstalarlos también, se hace desde "Aplicaciones instaladas" en la Configuración de Windows 11, igual que cualquier otro programa.
+    </div>
+  </div>
+
+  <h3>Qué hemos aprendido</h3>
+  <ol>
+    <li>Entendido qué problema resuelve Agent Reach: darle a tu agente de IA acceso real a internet y a redes sociales, sin que tengas que configurar cada plataforma por separado.</li>
+    <li>Preparado Windows 11 desde cero: Python, pipx, Node.js y GitHub CLI.</li>
+    <li>Instalado y comprobado Agent Reach con su propio comando de diagnóstico, <code>agent-reach doctor</code>.</li>
+    <li>Conseguido tu primera lectura real de una página web con tu agente.</li>
+    <li>Recorrido las 15 capacidades documentadas oficialmente, con ejemplos reales de cada una: desde las que no piden ninguna cuenta (páginas web, RSS, GitHub, YouTube, Bilibili, V2EX, búsqueda web) hasta las que requieren sesión iniciada (Twitter, Reddit, XiaoHongShu, Facebook, Instagram, Xueqiu, LinkedIn, Xiaoyuzhou).</li>
+    <li>Practicado con ejercicios y experimentos que muestran no solo <em>qué</em> hacer, sino <em>por qué</em> funciona así.</li>
+    <li>Combinado varias capacidades en proyectos progresivos, hasta un proyecto final de investigación completa sobre un tema de tu elección.</li>
+    <li>Sabes cómo diagnosticar problemas, mantener actualizado tu sistema, y desinstalarlo todo de forma limpia si alguna vez lo necesitas.</li>
+  </ol>
+  <p>A partir de aquí, la mejor forma de seguir aprendiendo es simplemente pedirle a tu agente de IA tareas reales que necesiten información de internet, y observar (con <code>agent-reach doctor</code> como tu herramienta de diagnóstico) qué capacidad está usando en cada caso.</p>
+</section>
+
+<!-- ============================================================ FUENTES -->
+<section class="section" id="fuentes">
+  <div class="sec-head">
+    <div class="sec-icon">📚</div>
+    <h2>Fuentes oficiales</h2>
+  </div>
+
+  <p>Todas las referencias utilizadas durante la elaboración de este tutorial, con sus enlaces directos:</p>
+
+  <div class="grid2">
+    <div class="card card-accent">
+      <h4 style="margin-top:0">Repositorio principal</h4>
+      <p><a href="https://github.com/Panniantong/Agent-Reach" target="_blank" rel="noopener">github.com/Panniantong/Agent-Reach</a></p>
+    </div>
+    <div class="card card-accent">
+      <h4 style="margin-top:0">Guía de instalación completa</h4>
+      <p><a href="https://github.com/Panniantong/Agent-Reach/blob/main/docs/install.md" target="_blank" rel="noopener">docs/install.md</a></p>
+    </div>
+    <div class="card card-accent">
+      <h4 style="margin-top:0">Guía de actualización</h4>
+      <p><a href="https://github.com/Panniantong/Agent-Reach/blob/main/docs/update.md" target="_blank" rel="noopener">docs/update.md</a></p>
+    </div>
+    <div class="card card-accent">
+      <h4 style="margin-top:0">Resolución de problemas</h4>
+      <p><a href="https://github.com/Panniantong/Agent-Reach/blob/main/docs/troubleshooting.md" target="_blank" rel="noopener">docs/troubleshooting.md</a></p>
+    </div>
+    <div class="card card-accent">
+      <h4 style="margin-top:0">Guía de exportación de cookies</h4>
+      <p><a href="https://github.com/Panniantong/Agent-Reach/blob/main/docs/cookie-export.md" target="_blank" rel="noopener">docs/cookie-export.md</a></p>
+    </div>
+    <div class="card card-accent">
+      <h4 style="margin-top:0">Política de seguridad</h4>
+      <p><a href="https://github.com/Panniantong/Agent-Reach/blob/main/SECURITY.md" target="_blank" rel="noopener">SECURITY.md</a></p>
+    </div>
+    <div class="card card-accent">
+      <h4 style="margin-top:0">Historial de cambios</h4>
+      <p><a href="https://github.com/Panniantong/Agent-Reach/blob/main/CHANGELOG.md" target="_blank" rel="noopener">CHANGELOG.md</a></p>
+    </div>
+    <div class="card card-accent">
+      <h4 style="margin-top:0">Instalador de Python (oficial)</h4>
+      <p><a href="https://www.python.org/downloads/" target="_blank" rel="noopener">python.org/downloads</a></p>
+    </div>
+    <div class="card card-accent">
+      <h4 style="margin-top:0">Instalador de Node.js (oficial)</h4>
+      <p><a href="https://nodejs.org/" target="_blank" rel="noopener">nodejs.org</a></p>
+    </div>
+    <div class="card card-accent">
+      <h4 style="margin-top:0">GitHub CLI (oficial)</h4>
+      <p><a href="https://cli.github.com" target="_blank" rel="noopener">cli.github.com</a></p>
+    </div>
+    <div class="card card-accent">
+      <h4 style="margin-top:0">Extensión Cookie-Editor (Chrome)</h4>
+      <p><a href="https://chromewebstore.google.com/detail/cookie-editor/hlkenndednhfkekhgcdicdfddnkalmdm" target="_blank" rel="noopener">chromewebstore.google.com/detail/cookie-editor</a></p>
+    </div>
+    <div class="card card-accent">
+      <h4 style="margin-top:0">Extensión OpenCLI (Chrome)</h4>
+      <p><a href="https://chromewebstore.google.com/detail/opencli/ildkmabpimmkaediidaifkhjpohdnifk" target="_blank" rel="noopener">chromewebstore.google.com/detail/opencli</a></p>
+    </div>
+    <div class="card card-accent">
+      <h4 style="margin-top:0">Consola de Groq (claves de API gratuitas)</h4>
+      <p><a href="https://console.groq.com" target="_blank" rel="noopener">console.groq.com</a></p>
+    </div>
+    <div class="card card-accent">
+      <h4 style="margin-top:0">uv / uvx (instalación oficial)</h4>
+      <p><a href="https://docs.astral.sh/uv/getting-started/installation/" target="_blank" rel="noopener">docs.astral.sh/uv/getting-started/installation</a></p>
+    </div>
+    <div class="card card-accent">
+      <h4 style="margin-top:0">Git for Windows</h4>
+      <p><a href="https://git-scm.com/download/win" target="_blank" rel="noopener">git-scm.com/download/win</a></p>
+    </div>
+    <div class="card card-accent">
+      <h4 style="margin-top:0">Proxy residencial (opcional, para Reddit desde servidor)</h4>
+      <p><a href="https://webshare.io" target="_blank" rel="noopener">webshare.io</a></p>
+    </div>
+    <div class="card card-accent">
+      <h4 style="margin-top:0">Security Advisories (reporte privado de vulnerabilidades)</h4>
+      <p><a href="https://github.com/Panniantong/Agent-Reach/security/advisories/new" target="_blank" rel="noopener">github.com/Panniantong/Agent-Reach/security/advisories/new</a></p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ CRÉDITOS -->
+<section class="section" id="creditos">
+  <div class="sec-head">
+    <div class="sec-icon">✨</div>
+    <h2>Créditos</h2>
+  </div>
+
+  <div id="svgHostCredits" style="width:100%;margin:0 0 26px;border-radius:14px;overflow:hidden;border:1px solid #1e3a5f;box-shadow:0 0 40px rgba(0,212,255,.14),0 18px 44px rgba(0,0,0,.55);background:#070b14;line-height:0"></div>
+
+  <div class="credits-card">
+    <h3>Agent Reach desde cero en Windows 11</h3>
+    <p class="credits-meta">Tutorial técnico · Windows 11 · Versión de referencia 1.5.0</p>
+    <div class="credits-name">Rubén Sbarsky</div>
+    <p class="credits-meta"><strong>Fecha:</strong> 18/09/2026</p>
+    <p class="credits-meta"><strong>Hora:</strong> 06:25:16</p>
+    <p class="credits-meta" style="margin-top:14px">📚 Tutorial solo con fines Educativos y Divulgación</p>
+    <p class="credits-lat">Fiat iustitia, ruat caelum.</p>
+  </div>
+
+  <div class="callout info">
+    <span class="ct">Indicación educativa</span>
+    Este material ha sido elaborado exclusivamente con fines educativos y de divulgación técnica. Todo el contenido sobre Agent Reach proviene de la documentación oficial de su repositorio. Las marcas, nombres de productos y servicios mencionados pertenecen a sus respectivos propietarios.
+  </div>
+</section>
+
+</main>
+
+<button id="toTop" aria-label="Volver arriba">↑</button>
+
+<footer>
+  <div>📚 Tutorial solo con fines Educativos y Divulgación</div>
+  <div>👨‍💻 Créditos: Rubén Sbarsky</div>
+  <div>📅 FECHA: 18/09/2026 · Hora: 06:25:16</div>
+  <div class="lat">Fiat iustitia, ruat caelum.</div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ============ SPA NAVIGATION ============ */
+  var navButtons = document.querySelectorAll('.navbtn');
+  var sections = document.querySelectorAll('.section');
+  var heroSvg = document.getElementById('heroSvg');
+  var svgHostHome = document.getElementById('svgHost');
+  var svgHostCredits = document.getElementById('svgHostCredits');
+  var currentSection = 'inicio';
+
+  function switchSection(targetId){
+    if(targetId === currentSection) return;
+
+    sections.forEach(function(s){
+      s.classList.remove('active');
+    });
+    var target = document.getElementById(targetId);
+    if(target){ target.classList.add('active'); }
+
+    navButtons.forEach(function(b){
+      b.classList.toggle('active', b.getAttribute('data-target') === targetId);
+    });
+
+    /* Mover SVG compartido entre HOME y CRÉDITOS */
+    if(targetId === 'creditos'){
+      if(heroSvg && svgHostCredits && heroSvg.parentNode !== svgHostCredits){
+        svgHostCredits.appendChild(heroSvg);
+        resetSvgAnimation();
+      }
+    } else if(targetId === 'inicio'){
+      if(heroSvg && svgHostHome && heroSvg.parentNode !== svgHostHome){
+        svgHostHome.appendChild(heroSvg);
+        resetSvgAnimation();
+      }
+    }
+
+    currentSection = targetId;
+    window.scrollTo({top:0, behavior:'auto'});
+    updateProgress();
+  }
+
+  function resetSvgAnimation(){
+    if(!heroSvg) return;
+    try{
+      if(typeof heroSvg.setCurrentTime === 'function'){
+        heroSvg.setCurrentTime(0);
+      }
+    }catch(e){ /* ignore */ }
+  }
+
+  navButtons.forEach(function(btn){
+    btn.addEventListener('click', function(){
+      switchSection(btn.getAttribute('data-target'));
+      /* Centrar el botón activo en la barra horizontal */
+      try{
+        btn.scrollIntoView({behavior:'smooth', block:'nearest', inline:'center'});
+      }catch(e){}
+    });
+  });
+
+  /* ============ PROGRESS BAR ============ */
+  var progressBar = document.getElementById('progressBar');
+  var toTop = document.getElementById('toTop');
+
+  function updateProgress(){
+    var docEl = document.documentElement;
+    var scrollTop = window.pageYOffset || docEl.scrollTop || 0;
+    var scrollHeight = docEl.scrollHeight - docEl.clientHeight;
+    var pct = scrollHeight > 0 ? (scrollTop / scrollHeight) * 100 : 0;
+    if(pct < 0) pct = 0;
+    if(pct > 100) pct = 100;
+    progressBar.style.width = pct + '%';
+    if(scrollTop > 320){
+      toTop.classList.add('show');
+    } else {
+      toTop.classList.remove('show');
+    }
+  }
+
+  window.addEventListener('scroll', updateProgress, {passive:true});
+  window.addEventListener('resize', updateProgress);
+
+  /* ============ BACK TO TOP ============ */
+  toTop.addEventListener('click', function(){
+    window.scrollTo({top:0, behavior:'smooth'});
+  });
+
+  /* ============ ACCORDIONS ============ */
+  var accHeads = document.querySelectorAll('.acc-head');
+  accHeads.forEach(function(h){
+    h.addEventListener('click', function(){
+      var parent = h.parentNode;
+      parent.classList.toggle('open');
+    });
+  });
+
+  /* ============ INIT ============ */
+  updateProgress();
+})();
+</script>
+</body>
+</html>
